@@ -1,0 +1,1019 @@
+<title>Laboratorio de Criptografía</title>
+<meta name="description" content="Laboratorio interactivo para aprender cifrado simétrico, asimétrico, hashing y sus vulnerabilidades." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+<style>
+  :root{
+    --bg:#E9E7DF; --surface:#F5F3ED; --surface-2:#FCFBF7;
+    --ink:#23252B; --muted:#6A6E76; --line:#D6D2C7; --line-strong:#C3BEB0;
+    --accent:#A96A16; --accent-2:#8A5510; --accent-soft:rgba(169,106,22,.12);
+    --secure:#1E7D63; --secure-soft:rgba(30,125,99,.12);
+    --danger:#BF3A26; --danger-soft:rgba(191,58,38,.10);
+    --console-bg:#1c1e24; --console-ink:#d8e0c8; --console-line:#31353f;
+    --radius:10px; --shadow:0 1px 2px rgba(20,20,25,.05),0 8px 24px rgba(20,20,25,.05);
+    --maxw:780px;
+    --font-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+    --font-serif:'IBM Plex Serif',Georgia,'Times New Roman',serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --bg:#15161C; --surface:#1D1F26; --surface-2:#24272F;
+      --ink:#E7E4DA; --muted:#969AA4; --line:#31343D; --line-strong:#40444F;
+      --accent:#E3A24A; --accent-2:#EDB463; --accent-soft:rgba(227,162,74,.14);
+      --secure:#57C9A6; --secure-soft:rgba(87,201,166,.14);
+      --danger:#F0664F; --danger-soft:rgba(240,102,79,.13);
+      --console-bg:#101218; --console-ink:#c9d6b3; --console-line:#282c35;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15161C; --surface:#1D1F26; --surface-2:#24272F;
+    --ink:#E7E4DA; --muted:#969AA4; --line:#31343D; --line-strong:#40444F;
+    --accent:#E3A24A; --accent-2:#EDB463; --accent-soft:rgba(227,162,74,.14);
+    --secure:#57C9A6; --secure-soft:rgba(87,201,166,.14);
+    --danger:#F0664F; --danger-soft:rgba(240,102,79,.13);
+    --console-bg:#101218; --console-ink:#c9d6b3; --console-line:#282c35;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans);
+    font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4{font-family:var(--font-serif);text-wrap:balance;line-height:1.2;margin:0;font-weight:600}
+  p{margin:0}
+  a{color:var(--accent-2)}
+  code,kbd,samp{font-family:var(--font-mono)}
+  button{font-family:var(--font-sans);cursor:pointer}
+  input,textarea,select{font-family:var(--font-sans);color:var(--ink)}
+  ::selection{background:var(--accent-soft)}
+
+  /* ---------- Layout shell ---------- */
+  .shell{display:grid;grid-template-columns:232px minmax(0,1fr);gap:0;max-width:1180px;margin:0 auto}
+  .sidebar{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;height:100dvh;
+    padding:26px 20px 26px 24px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:22px;overflow-y:auto}
+  .brand{display:flex;flex-direction:column;gap:8px}
+  .brand .mark{width:34px;height:34px;border-radius:8px;background:var(--console-bg);
+    display:grid;place-items:center;color:var(--console-ink);font-family:var(--font-mono);font-weight:600;font-size:15px;
+    border:1px solid var(--console-line)}
+  .brand .name{font-family:var(--font-serif);font-weight:700;font-size:18px;line-height:1.15}
+  .brand .tag{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  nav.toc{display:flex;flex-direction:column;gap:1px}
+  nav.toc a{display:flex;gap:9px;align-items:baseline;text-decoration:none;color:var(--muted);
+    padding:6px 9px;border-radius:7px;font-size:13.5px;line-height:1.35;transition:background .15s,color .15s}
+  nav.toc a .num{font-family:var(--font-mono);font-size:11px;color:var(--line-strong)}
+  nav.toc a:hover{background:var(--accent-soft);color:var(--ink)}
+  nav.toc a.active{background:var(--accent-soft);color:var(--ink);font-weight:600}
+  nav.toc a.active .num{color:var(--accent)}
+  .theme-toggle{margin-top:auto;display:flex;gap:6px;align-items:center;background:var(--surface);
+    border:1px solid var(--line);border-radius:8px;padding:4px}
+  .theme-toggle button{flex:1;border:none;background:transparent;color:var(--muted);font-size:12px;
+    padding:5px;border-radius:6px;display:flex;gap:5px;justify-content:center;align-items:center}
+  .theme-toggle button[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
+
+  main{padding:0 clamp(20px,4vw,56px);min-width:0}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-block:56px 96px}
+  section{scroll-margin-top:24px;padding-block:38px 0}
+  section+section{border-top:1px solid var(--line);margin-top:44px}
+
+  .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--accent);opacity:.6}
+  section > h2{font-size:29px;letter-spacing:-.01em;margin-bottom:12px}
+  .lead{color:var(--muted);font-size:16px;max-width:60ch;margin-bottom:8px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding-block:60px 8px;border:none}
+  .hero h1{font-size:clamp(34px,6vw,52px);font-weight:700;letter-spacing:-.02em;margin-bottom:20px}
+  .hero h1 em{font-style:italic;color:var(--accent-2)}
+  .hero .sub{font-size:18px;color:var(--muted);max-width:56ch;margin-bottom:26px}
+  .cast{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .cast .who{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);
+    border-radius:999px;padding:6px 14px 6px 6px;font-size:13px}
+  .cast .who .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+    font-family:var(--font-mono);font-weight:600;font-size:12px;color:#fff}
+  .cast .who b{font-weight:600}
+  .cast .who span{color:var(--muted)}
+  .av.alice{background:#B0447B}.av.bob{background:#2E6CA6}.av.eve{background:#B3462F}
+
+  /* ---------- Cards ---------- */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px;margin-top:22px}
+  .card h3{font-size:18px;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+  .card .card-note{color:var(--muted);font-size:13.5px;margin-bottom:16px}
+
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .field label{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row > .field{flex:1;min-width:140px}
+  textarea,input[type=text],input[type=password],select{
+    width:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px;
+    padding:9px 11px;font-size:14px;resize:vertical;transition:border-color .15s,box-shadow .15s}
+  textarea{font-family:var(--font-mono);font-size:13px;line-height:1.5;min-height:64px}
+  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  select{cursor:pointer}
+
+  .btns{display:flex;gap:9px;flex-wrap:wrap;margin-top:4px}
+  button.act{background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:8px;
+    padding:9px 16px;font-size:13.5px;font-weight:600;transition:filter .15s,transform .05s}
+  :root[data-theme="dark"] button.act, :root:not([data-theme="light"]) button.act{color:#1a1206}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button.act{color:#1a1206}}
+  button.act:hover{filter:brightness(1.06)}
+  button.act:active{transform:translateY(1px)}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-strong);border-radius:8px;
+    padding:9px 15px;font-size:13.5px;font-weight:500}
+  button.ghost:hover{background:var(--accent-soft);border-color:var(--accent)}
+  button.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+  button:disabled{opacity:.5;cursor:not-allowed}
+
+  .out{background:var(--console-bg);color:var(--console-ink);border:1px solid var(--console-line);
+    border-radius:8px;padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.55;
+    white-space:pre-wrap;word-break:break-all;overflow-x:auto;margin-top:14px}
+  .out .lbl{color:#8a94a6;display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:2px 0 3px}
+  .out .lbl:first-child{margin-top:0}
+  .out .k{color:#e3a24a}.out .g{color:#7fc9a6}.out .r{color:#f0664f}.out .d{color:#8a94a6}
+
+  .timing{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:12px;
+    background:var(--accent-soft);color:var(--accent-2);border-radius:999px;padding:3px 11px;margin-top:12px}
+  .timing b{font-weight:600;font-variant-numeric:tabular-nums}
+
+  /* ---------- Explain / vuln blocks ---------- */
+  .explain{margin-top:16px;padding:15px 16px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)}
+  .explain h4{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:8px;font-weight:600}
+  .explain p{font-size:14px}.explain p+p{margin-top:9px}
+  .callout{margin-top:16px;border-radius:9px;padding:15px 16px 15px 18px;position:relative;overflow:hidden}
+  .callout::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
+  .callout h4{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    margin-bottom:7px;display:flex;align-items:center;gap:8px;font-weight:600}
+  .callout p{font-size:13.5px}.callout p+p{margin-top:8px}
+  .callout code{background:rgba(128,128,128,.14);padding:1px 5px;border-radius:4px;font-size:12.5px}
+  .vuln{background:var(--danger-soft)}.vuln::before{background:var(--danger)}.vuln h4{color:var(--danger)}
+  .fix{background:var(--secure-soft)}.fix::before{background:var(--secure)}.fix h4{color:var(--secure)}
+
+  .formula{font-family:var(--font-mono);background:var(--surface-2);border:1px solid var(--line);
+    border-radius:8px;padding:11px 14px;font-size:13.5px;margin:12px 0;overflow-x:auto;white-space:nowrap;color:var(--ink)}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;
+    padding:2px 9px;border-radius:999px;border:1px solid var(--line-strong);color:var(--muted)}
+  .pill.ok{color:var(--secure);border-color:var(--secure);background:var(--secure-soft)}
+  .pill.bad{color:var(--danger);border-color:var(--danger);background:var(--danger-soft)}
+
+  canvas{max-width:100%;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);display:block}
+  .canvases{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px}
+  .canvases figure{margin:0;flex:1;min-width:150px}
+  .canvases figcaption{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin-top:7px;display:flex;justify-content:space-between;align-items:center}
+
+  /* attack progress */
+  .barwrap{display:flex;flex-direction:column;gap:3px;margin-top:10px;font-family:var(--font-mono);font-size:11px}
+  .bar{display:flex;align-items:center;gap:8px}
+  .bar .cand{width:26px;color:var(--muted);text-align:right}
+  .bar .track{flex:1;height:11px;background:var(--surface-2);border-radius:3px;overflow:hidden;border:1px solid var(--line)}
+  .bar .fill{height:100%;background:var(--accent);width:0;transition:width .12s}
+  .bar.win .fill{background:var(--secure)}
+  .bar .ms{width:60px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+
+  .reveal{font-family:var(--font-mono);font-size:16px;letter-spacing:.06em;margin-top:12px;
+    background:var(--console-bg);color:var(--console-ink);border-radius:8px;padding:12px 14px;border:1px solid var(--console-line)}
+  .reveal .done{color:var(--secure)}.reveal .cur{background:var(--accent);color:#1a1206;border-radius:2px}
+  .reveal .todo{color:#565d6b}
+
+  table.mit{width:100%;border-collapse:collapse;margin-top:18px;font-size:13.5px}
+  table.mit th,table.mit td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.mit th{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  table.mit td:first-child{font-weight:600}
+  table.mit .wrapx{overflow-x:auto}
+
+  .hashgrid{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+  .hashrow{display:grid;grid-template-columns:96px 1fr auto;gap:12px;align-items:center;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+  .hashrow .algo{font-family:var(--font-mono);font-weight:600;font-size:12.5px;display:flex;align-items:center;gap:6px}
+  .hashrow .digest{font-family:var(--font-mono);font-size:11.5px;word-break:break-all;color:var(--muted)}
+  .hashrow .tm{font-family:var(--font-mono);font-size:11px;color:var(--accent-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .avax{font-family:var(--font-mono);font-size:12.5px;word-break:break-all;line-height:1.7;margin-top:6px}
+  .avax .diff{background:var(--danger);color:#fff;border-radius:2px;padding:0 1px}
+
+  .steps{display:flex;flex-direction:column;gap:0;margin-top:8px;counter-reset:s}
+  .step{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .step:last-child{border-bottom:none}
+  .step .n{width:26px;height:26px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;
+    font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+  .step b{font-weight:600}
+  .step .who-tag{font-family:var(--font-mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+
+  .fdrop{border:1.5px dashed var(--line-strong);border-radius:9px;padding:20px;text-align:center;color:var(--muted);
+    font-size:13.5px;background:var(--surface-2);transition:border-color .15s,background .15s}
+  .fdrop.hot{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+  .fdrop input{display:none}
+  .fimg{max-height:160px;border-radius:8px;margin-top:12px;border:1px solid var(--line)}
+
+  hr.soft{border:none;border-top:1px solid var(--line);margin:22px 0}
+  .subhead{font-family:var(--font-serif);font-size:20px;font-weight:600;margin:34px 0 4px}
+
+  @media (max-width:860px){
+    .shell{grid-template-columns:1fr}
+    .sidebar{position:sticky;top:0;height:auto;flex-direction:row;align-items:center;gap:14px;
+      border-right:none;border-bottom:1px solid var(--line);padding:12px 16px;overflow-x:auto;z-index:20;
+      background:var(--bg);flex-wrap:nowrap}
+    .brand{flex-direction:row;align-items:center;gap:10px;flex:0 0 auto}
+    .brand .tag{display:none}
+    nav.toc{flex-direction:row;gap:2px;flex:1;overflow-x:auto}
+    nav.toc a{white-space:nowrap;padding:6px 10px}
+    nav.toc a .num{display:none}
+    .theme-toggle{margin-top:0;flex:0 0 auto}
+    .theme-toggle button span{display:none}
+    .wrap{padding-block:32px 80px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">λ</div>
+      <div>
+        <div class="name">Cripto·Lab</div>
+        <div class="tag">Laboratorio didáctico</div>
+      </div>
+    </div>
+    <nav class="toc" id="toc">
+      <a href="#intro"><span class="num">00</span> Introducción</a>
+      <a href="#simetrico"><span class="num">01</span> Cifrado simétrico</a>
+      <a href="#asimetrico"><span class="num">02</span> Cifrado asimétrico</a>
+      <a href="#hash"><span class="num">03</span> Funciones hash</a>
+      <a href="#archivos"><span class="num">04</span> Cifrar archivos</a>
+      <a href="#criptoanalisis"><span class="num">05</span> Criptoanálisis</a>
+      <a href="#implementacion"><span class="num">06</span> Ataques de implementación</a>
+      <a href="#historia"><span class="num">07</span> Fallos históricos</a>
+      <a href="#mitigaciones"><span class="num">08</span> Mitigaciones</a>
+    </nav>
+    <div class="theme-toggle" role="group" aria-label="Tema">
+      <button data-set="light" aria-pressed="false">☀︎ <span>Claro</span></button>
+      <button data-set="dark" aria-pressed="false">☾ <span>Oscuro</span></button>
+    </div>
+  </aside>
+
+  <main>
+  <div class="wrap">
+
+    <!-- ============ HERO / INTRO ============ -->
+    <section id="intro" class="hero">
+      <div class="eyebrow">Criptografía aplicada · para estudiantes</div>
+      <h1>Cifra, descifra y <em>rompe</em> algoritmos en tu navegador.</h1>
+      <p class="sub">Un laboratorio para experimentar con las tres familias de la criptografía —simétrica, asimétrica y funciones hash— entender <em>por qué</em> funcionan, medir su coste y comprobar, con tus propias manos, cómo se rompen cuando se usan mal.</p>
+
+      <div class="cast">
+        <div class="who"><span class="av alice">A</span><div><b>Alice</b> · <span>emisora</span></div></div>
+        <div class="who"><span class="av bob">B</span><div><b>Bob</b> · <span>receptor</span></div></div>
+        <div class="who"><span class="av eve">E</span><div><b>Eve</b> · <span>atacante / escucha</span></div></div>
+      </div>
+
+      <div class="card">
+        <h3>Las tres herramientas del oficio</h3>
+        <p class="card-note">Toda la criptografía moderna combina estas tres piezas. Cada sección del laboratorio corresponde a una.</p>
+        <div class="steps">
+          <div class="step"><span class="n">01</span><div><b>Cifrado simétrico</b> — Alice y Bob comparten <b>una misma clave secreta</b>. Rápido y para grandes volúmenes (AES). Problema: ¿cómo se ponen de acuerdo en la clave sin que Eve la vea?</div></div>
+          <div class="step"><span class="n">02</span><div><b>Cifrado asimétrico</b> — cada persona tiene una <b>clave pública</b> (que reparte) y una <b>privada</b> (que guarda). Resuelve el reparto de claves y permite firmas digitales (RSA). Más lento.</div></div>
+          <div class="step"><span class="n">03</span><div><b>Funciones hash</b> — una <b>huella digital de una sola vía</b>: comprueban integridad y guardan contraseñas, pero <b>no cifran</b> (no se pueden invertir).</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SIMÉTRICO ============ -->
+    <section id="simetrico">
+      <div class="eyebrow">01 · Una sola clave secreta</div>
+      <h2>Cifrado simétrico — AES</h2>
+      <p class="lead">La misma clave cifra y descifra. AES (Advanced Encryption Standard) es el estándar mundial: trabaja en bloques de 16 bytes. Lo interesante —y peligroso— es el <b>modo de operación</b> que encadena esos bloques.</p>
+
+      <div class="card">
+        <h3>Banco de pruebas AES</h3>
+        <p class="card-note">Escribe un mensaje, elige una clave y un modo. Verás el criptograma y el tiempo de ejecución. GCM es cifrado autenticado (recomendado); ECB es deliberadamente inseguro para que veas por qué.</p>
+        <div class="field">
+          <label for="s-msg">Mensaje de Alice</label>
+          <textarea id="s-msg">Nos vemos a medianoche en el puente. — Alice</textarea>
+        </div>
+        <div class="row">
+          <div class="field"><label for="s-key">Clave / contraseña</label><input type="text" id="s-key" value="clave-compartida-2026" /></div>
+          <div class="field" style="flex:0 0 150px"><label for="s-mode">Modo</label>
+            <select id="s-mode">
+              <option value="GCM">AES-GCM (autenticado ✓)</option>
+              <option value="CBC">AES-CBC + IV</option>
+              <option value="CTR">AES-CTR (flujo)</option>
+              <option value="ECB">AES-ECB (inseguro)</option>
+            </select>
+          </div>
+        </div>
+        <div class="btns">
+          <button class="act" id="s-enc">Cifrar →</button>
+          <button class="ghost" id="s-dec">← Descifrar</button>
+        </div>
+        <div class="out" id="s-out"><span class="d">El criptograma aparecerá aquí…</span></div>
+        <div id="s-time"></div>
+      </div>
+
+      <div class="card">
+        <h3>Por qué ECB filtra el mensaje (ataque CPA)</h3>
+        <p class="card-note">En modo ECB cada bloque de 16 bytes se cifra por separado: <b>bloques iguales producen criptogramas iguales</b>. Ciframos la misma imagen con ECB y con CBC. Observa cómo el contorno sobrevive en ECB.</p>
+        <div class="btns"><button class="act" id="ecb-run">Cifrar imagen ▸</button></div>
+        <div class="canvases">
+          <figure><canvas id="cv-orig" width="150" height="150"></canvas><figcaption><span>Original</span></figcaption></figure>
+          <figure><canvas id="cv-ecb" width="150" height="150"></canvas><figcaption><span>AES-ECB</span><span class="pill bad">patrón visible</span></figcaption></figure>
+          <figure><canvas id="cv-cbc" width="150" height="150"></canvas><figcaption><span>AES-CBC</span><span class="pill ok">ruido</span></figcaption></figure>
+        </div>
+        <div class="callout vuln">
+          <h4>⚠ Vulnerabilidad · CPA sobre ECB</h4>
+          <p>El modo ECB es <b>determinista</b>: sin vector de inicialización, un atacante que puede pedir cifrados (ataque de texto plano elegido) aísla bloques idénticos y filtra datos secretos adyacentes. El famoso "pingüino ECB" es exactamente esto.</p>
+        </div>
+        <div class="callout fix">
+          <h4>✓ Mitigación</h4>
+          <p>Usa cifradores <b>probabilísticos con IV aleatorio</b> nunca reutilizado. Mejor aún, <b>cifrado autenticado (AEAD)</b>: <code>AES-GCM</code> o <code>ChaCha20-Poly1305</code>, que además detectan manipulaciones.</p>
+        </div>
+      </div>
+
+      <div class="explain">
+        <h4>Vulnerabilidades del cifrado simétrico</h4>
+        <p><b>Reparto de la clave:</b> Alice y Bob deben compartir la clave por un canal seguro previo. Si Eve la intercepta, todo cae. Esto lo resuelve el cifrado asimétrico (sección 02).</p>
+        <p><b>Reutilización de IV / clave:</b> repetir el par (clave, IV) en cifradores de flujo o en CTR/GCM rompe la seguridad por completo (ver <b>KPA</b> y <b>WEP</b> más abajo).</p>
+      </div>
+    </section>
+
+    <!-- ============ ASIMÉTRICO ============ -->
+    <section id="asimetrico">
+      <div class="eyebrow">02 · Clave pública y clave privada</div>
+      <h2>Cifrado asimétrico — RSA</h2>
+      <p class="lead">Cada uno tiene dos claves ligadas matemáticamente. Lo que cifra la pública sólo lo descifra la privada. Así Bob puede escribir a Alice sin haber compartido nunca un secreto: usa la clave pública de Alice, que es… pública.</p>
+
+      <div class="card">
+        <h3>Alice y Bob con RSA-2048 (Web Crypto real)</h3>
+        <p class="card-note">Se genera un par de claves real en tu navegador. Bob cifra con la clave <b>pública</b> de Alice; sólo la clave <b>privada</b> de Alice lo abre.</p>
+        <div class="btns"><button class="act" id="rsa-gen">① Alice genera su par de claves</button></div>
+        <div class="out" id="rsa-keys"><span class="d">Aún no hay claves. Genera el par de Alice…</span></div>
+
+        <hr class="soft" />
+        <div class="field"><label for="rsa-msg">② Mensaje de Bob para Alice</label>
+          <textarea id="rsa-msg">Alice, confirmo la reunión. — Bob</textarea></div>
+        <div class="btns">
+          <button class="act" id="rsa-enc" disabled>Bob cifra con la pública de Alice →</button>
+          <button class="ghost" id="rsa-dec" disabled>← Alice descifra con su privada</button>
+        </div>
+        <div class="out" id="rsa-out"><span class="d">Genera primero las claves.</span></div>
+        <div id="rsa-time"></div>
+      </div>
+
+      <div class="explain">
+        <h4>¿Por qué es seguro? — el problema de la factorización</h4>
+        <p>La clave pública contiene un número enorme <code>n = p·q</code>, producto de dos primos secretos. Multiplicar <code>p·q</code> es trivial; <b>factorizar n</b> de vuelta en <code>p</code> y <code>q</code> es computacionalmente inviable con claves de 2048 bits. Esa asimetría de dificultad es toda la magia.</p>
+      </div>
+      <div class="callout vuln">
+        <h4>⚠ Vulnerabilidad · RSA "de libro" es maleable (ataque CCA)</h4>
+        <p>Sin relleno (padding), <code>c = mᵉ mod n</code> es homomórfico: <code>(2ᵉ·c) mod n = (2m)ᵉ mod n</code>. Eve intercepta <code>c</code>, pide descifrar <code>c' = 2ᵉ·c</code>, recibe <code>2m</code> y divide entre 2 → obtiene <b>m</b> sin la clave privada. Lo demostramos en vivo en la sección 05.</p>
+      </div>
+      <div class="callout fix">
+        <h4>✓ Mitigación</h4>
+        <p>Nunca uses RSA "textbook". Usa relleno probabilístico <code>RSA-OAEP</code> (el que emplea este laboratorio) para cifrar y <code>RSA-PSS</code> para firmar. Para intercambiar claves de sesión hoy se prefiere <b>curvas elípticas (ECDH/X25519)</b>: claves más cortas, más rápidas.</p>
+      </div>
+    </section>
+
+    <!-- ============ HASH ============ -->
+    <section id="hash">
+      <div class="eyebrow">03 · Huella de una sola vía</div>
+      <h2>Funciones hash</h2>
+      <p class="lead">Un hash convierte cualquier entrada en una huella de tamaño fijo. Es de <b>una sola vía</b>: es fácil calcular el hash de un mensaje, pero inviable reconstruir el mensaje a partir del hash. No cifra: sirve para <b>integridad</b> y para guardar contraseñas.</p>
+
+      <div class="card">
+        <h3>Comparador de algoritmos</h3>
+        <p class="card-note">El mismo texto pasado por cuatro algoritmos, con su tiempo de cálculo. Fíjate en la longitud fija de cada salida y en el aviso de los algoritmos rotos.</p>
+        <div class="field"><label for="h-msg">Entrada</label>
+          <textarea id="h-msg" style="min-height:52px">Alice</textarea></div>
+        <div class="hashgrid" id="h-grid"></div>
+      </div>
+
+      <div class="card">
+        <h3>Efecto avalancha · propiedad de una sola vía</h3>
+        <p class="card-note">Cambia <b>un solo</b> carácter y observa cómo la mitad de los bits de la huella cambian. Es lo que hace imposible "adivinar hacia atrás".</p>
+        <div class="row">
+          <div class="field"><label for="av-a">Mensaje A</label><input type="text" id="av-a" value="Pago a Bob: 100 EUR" /></div>
+          <div class="field"><label for="av-b">Mensaje B</label><input type="text" id="av-b" value="Pago a Bob: 900 EUR" /></div>
+        </div>
+        <div class="out" style="margin-top:8px">
+          <span class="lbl">SHA-256(A)</span><div class="avax" id="av-ha"></div>
+          <span class="lbl">SHA-256(B)</span><div class="avax" id="av-hb"></div>
+        </div>
+        <div id="av-stat" class="timing"></div>
+      </div>
+
+      <div class="explain">
+        <h4>Las tres propiedades que debe cumplir un hash criptográfico</h4>
+        <p><b>Resistencia a preimagen:</b> dado un hash, no puedes hallar un mensaje que lo produzca (la "una sola vía"). <b>Segunda preimagen:</b> dado un mensaje, no puedes hallar otro con el mismo hash. <b>Resistencia a colisiones:</b> no puedes hallar <i>ningún</i> par de mensajes distintos con el mismo hash.</p>
+      </div>
+      <div class="callout vuln">
+        <h4>⚠ Vulnerabilidad · MD5 y SHA-1 tienen colisiones</h4>
+        <p>MD5 (1992) está <b>roto</b>: se pueden fabricar dos archivos distintos con idéntica huella. SHA-1 (1995) cayó en 2017 (ataque <i>SHAttered</i>). En la sección 07 verás una colisión de MD5 <b>real, calculada en vivo</b>.</p>
+      </div>
+      <div class="callout fix">
+        <h4>✓ Mitigación</h4>
+        <p>Para integridad usa <b>SHA-256</b> o superior. Para <b>contraseñas</b> nunca uses un hash simple: usa funciones lentas y con sal como <code>bcrypt</code>, <code>scrypt</code> o <code>Argon2</code>.</p>
+      </div>
+    </section>
+
+    <!-- ============ ARCHIVOS ============ -->
+    <section id="archivos">
+      <div class="eyebrow">04 · Cifrado de ficheros</div>
+      <h2>Cifrar archivos</h2>
+      <p class="lead">El mismo AES sirve para archivos completos. Aquí la clave se deriva de tu contraseña con <b>PBKDF2</b> (miles de iteraciones + sal) y se cifra con <b>AES-GCM</b>, que también verifica que nadie haya alterado el fichero.</p>
+
+      <div class="card">
+        <h3>Cifra y recupera un archivo</h3>
+        <p class="card-note">Elige un archivo (una imagen se ve muy bien). Se cifra, te muestro el criptograma y su tamaño, y luego lo descifro para probar que se recupera intacto.</p>
+        <label class="fdrop" id="f-drop">
+          <input type="file" id="f-input" />
+          <b>Haz clic o arrastra un archivo aquí</b><br />imágenes, PDF, texto… todo son bytes
+        </label>
+        <div class="field" style="margin-top:14px"><label for="f-pass">Contraseña</label><input type="password" id="f-pass" value="secreto-de-alice" /></div>
+        <div class="btns">
+          <button class="act" id="f-enc" disabled>🔒 Cifrar archivo</button>
+          <button class="ghost" id="f-dec" disabled>🔓 Descifrar y recuperar</button>
+        </div>
+        <div class="out" id="f-out"><span class="d">Selecciona un archivo para empezar…</span></div>
+        <div id="f-time"></div>
+        <div id="f-preview"></div>
+      </div>
+      <div class="explain">
+        <h4>Nota didáctica</h4>
+        <p>Todo ocurre <b>en tu navegador</b>: ningún archivo se sube a ningún servidor. Como este entorno de demostración bloquea las descargas, en lugar de guardar el <code>.enc</code> lo <b>ciframos y desciframos aquí mismo</b> para que compruebes que el proceso es reversible con la contraseña correcta… y sólo con ella.</p>
+      </div>
+    </section>
+
+    <!-- ============ CRIPTOANÁLISIS TEÓRICO ============ -->
+    <section id="criptoanalisis">
+      <div class="eyebrow">05 · Atacar el algoritmo</div>
+      <h2>Criptoanálisis clásico</h2>
+      <p class="lead">Estos ataques no dependen de un fallo de programación, sino de <b>debilidades del propio esquema</b>. Se clasifican por lo que el atacante puede conseguir.</p>
+
+      <!-- KPA -->
+      <div class="subhead">KPA · Ataque de texto plano conocido</div>
+      <p class="lead" style="font-size:15px">Si un cifrador de flujo reutiliza el flujo de clave (keystream), conocer parte del texto plano revela el flujo — y con él, otros mensajes. Las cabeceras fijas de PDF (<code>%PDF-</code>) o ZIP (<code>PK␃␄</code>) son texto plano "gratis" para Eve.</p>
+      <div class="card">
+        <h3>Recuperar el keystream de un One-Time Pad reutilizado</h3>
+        <p class="card-note">Dos mensajes cifrados con <b>la misma</b> clave de flujo: C₁ = P₁⊕K y C₂ = P₂⊕K. Como conoces parte de P₁, recuperas K y descifras P₂. Es exactamente el fallo de WEP.</p>
+        <div class="field"><label for="kpa-known">Texto plano conocido (inicio de P₁)</label><input type="text" id="kpa-known" value="CONFIDENCIAL: " /></div>
+        <div class="btns"><button class="act" id="kpa-run">Ejecutar ataque KPA ▸</button></div>
+        <div class="out" id="kpa-out"><span class="d">Pulsa para interceptar y romper…</span></div>
+      </div>
+
+      <!-- CCA textbook RSA -->
+      <div class="subhead">CCA · Maleabilidad del RSA sin padding</div>
+      <p class="lead" style="font-size:15px">Un ataque de <b>texto cifrado elegido</b>: Eve no conoce la clave privada, pero puede pedir a un "oráculo" que descifre mensajes de su elección. Explota que RSA sin padding es homomórfico.</p>
+      <div class="card">
+        <h3>Robar el mensaje multiplicando por 2</h3>
+        <p class="card-note">Usamos RSA "de libro" con primos pequeños para que veas los números. Eve nunca toca <code>d</code>: sólo multiplica el criptograma por <code>2ᵉ</code>, lo pasa por el oráculo y divide entre 2.</p>
+        <div class="btns"><button class="act" id="cca-run">Ejecutar ataque CCA ▸</button></div>
+        <div class="out" id="cca-out"><span class="d">Pulsa para ver la maleabilidad en acción…</span></div>
+        <div class="callout fix"><h4>✓ Mitigación</h4><p>OAEP añade aleatoriedad y estructura verificable: <code>2ᵉ·c</code> deja de descifrar a algo con padding válido, y el oráculo rechaza la petición.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ IMPLEMENTACIÓN ============ -->
+    <section id="implementacion">
+      <div class="eyebrow">06 · Atacar la implementación</div>
+      <h2>Oráculos y canales laterales</h2>
+      <p class="lead">Aquí el algoritmo es sólido, pero <b>cómo se programa o se ejecuta</b> filtra información: un mensaje de error, un microsegundo de más, el consumo eléctrico de un chip.</p>
+
+      <!-- PADDING ORACLE -->
+      <div class="subhead">A · Padding Oracle (CBC + PKCS#7)</div>
+      <p class="lead" style="font-size:15px">Si el servidor descifra en CBC y luego revela si el <b>relleno</b> es válido o no, Eve reconstruye el mensaje <b>byte a byte sin conocer la clave</b>. Recordemos la ecuación del modo CBC:</p>
+      <div class="formula">Pᵢ = D<sub>K</sub>(Cᵢ) ⊕ C<sub>ᵢ₋₁</sub>  →  al tocar C<sub>ᵢ₋₁</sub> controlamos directamente Pᵢ</div>
+      <div class="card">
+        <h3>Oráculo de padding en vivo</h3>
+        <p class="card-note">El servidor guarda un secreto de 16 bytes cifrado con una clave que <b>tú no ves</b>. Su única fuga: responde "padding válido / inválido". Con eso basta.</p>
+        <div class="btns">
+          <button class="act" id="po-run">Lanzar ataque ▸</button>
+          <button class="ghost" id="po-reset">Reiniciar secreto</button>
+        </div>
+        <div class="reveal" id="po-reveal"><span class="todo">················</span></div>
+        <div class="out" id="po-out"><span class="d">El oráculo espera consultas…</span></div>
+        <div id="po-time"></div>
+        <div class="callout vuln"><h4>⚠ Vulnerabilidad</h4><p>Descifrar y <b>después</b> verificar el padding, revelando el resultado (o tardando distinto), convierte al servidor en un oráculo. ~256 consultas por byte bastan.</p></div>
+        <div class="callout fix"><h4>✓ Mitigación (CCA2)</h4><p><b>Cifrado autenticado AEAD</b> (AES-GCM, ChaCha20-Poly1305): se verifica primero el tag MAC; si falla, <b>el descifrado ni siquiera se ejecuta</b>. Nada que filtrar.</p></div>
+      </div>
+
+      <!-- TIMING -->
+      <div class="subhead">B · Timing Attack (canal lateral por tiempo)</div>
+      <p class="lead" style="font-size:15px">Comparar un token o firma con <code>==</code> se detiene en el primer byte incorrecto. Midiendo cuánto tarda, Eve deduce el secreto carácter a carácter.</p>
+      <div class="card">
+        <h3>Recuperar un token midiendo microsegundos</h3>
+        <p class="card-note">La comparación insegura se frena en el primer error. Para cada posición, el byte correcto tarda un poquito más. Amplificamos ese tiempo para que se vea; el ataque prueba candidatos y elige el más lento.</p>
+        <div class="btns">
+          <button class="act" id="tm-run">Ejecutar ataque de tiempos ▸</button>
+        </div>
+        <div class="reveal" id="tm-reveal"><span class="todo">·······</span></div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:10px" id="tm-pos"></div>
+        <div class="barwrap" id="tm-bars"></div>
+        <div id="tm-time"></div>
+        <div class="callout fix"><h4>✓ Mitigación</h4><p>Comparaciones en <b>tiempo constante</b>: <code>hmac.compare_digest()</code> (Python), <code>crypto.timingSafeEqual()</code> (Node), <code>CRYPTO_memcmp()</code> (OpenSSL). Recorren todos los bytes siempre, sin ramas que dependan del secreto.</p></div>
+      </div>
+
+      <!-- SIDE CHANNEL POWER -->
+      <div class="subhead">C · Análisis de consumo y fallos físicos</div>
+      <p class="lead" style="font-size:15px">En tarjetas bancarias y llaves FIDO, la clave se filtra por el <b>consumo eléctrico</b> del chip. La multiplicación escalar <code>Q = k·P</code> usa "doblar-y-sumar": un bit <code>1</code> consume distinto que un <code>0</code>.</p>
+      <div class="card">
+        <h3>Leer la clave en la traza de potencia (SPA)</h3>
+        <p class="card-note">Esta es una traza sintética de un osciloscopio sobre el pin V<sub>DD</sub>. Un pico ancho (doblar + sumar) es un <b>1</b>; uno estrecho (sólo doblar) es un <b>0</b>. Pasa el ratón para leerla.</p>
+        <canvas id="spa" width="720" height="180"></canvas>
+        <div class="out" id="spa-out"><span class="lbl">Clave leída de la traza</span><span class="k" id="spa-bits">—</span></div>
+        <div class="callout vuln"><h4>⚠ SPA / DPA · Fault Injection</h4><p><b>Análisis de potencia:</b> una sonda de corriente + osciloscopio revelan los bits de la clave. <b>Inyección de fallos (glitching):</b> un pulso de tensión o láser justo en un <code>if (!is_admin) return;</code> provoca un salto de instrucción y evade la comprobación sin conocer ninguna clave.</p></div>
+        <div class="callout fix"><h4>✓ Mitigación</h4><p>Algoritmos <b>sin ramas dependientes del secreto</b> (branchless, tiempo/consumo constante), enmascaramiento aleatorio, blindaje del encapsulado y detectores de caídas de tensión en hardware.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ HISTORIA ============ -->
+    <section id="historia">
+      <div class="eyebrow">07 · Cuando la teoría se rompió de verdad</div>
+      <h2>Dos fallos que hicieron historia</h2>
+
+      <div class="subhead">La colisión de MD5</div>
+      <div class="card">
+        <h3>Dos mensajes distintos, la misma huella</h3>
+        <p class="card-note">Estos dos bloques de 128 bytes (Wang &amp; Yu, 2004) difieren en unos pocos bytes —marcados en rojo— pero producen <b>exactamente</b> el mismo MD5. Lo comprobamos calculándolo en vivo con crypto-js.</p>
+        <div class="btns"><button class="act" id="md5-run">Calcular MD5 de ambos ▸</button></div>
+        <div class="out" id="md5-out"><span class="d">Pulsa para ver la colisión…</span></div>
+        <div class="callout vuln"><h4>⚠ Por qué importa</h4><p>Con una colisión se pueden fabricar <b>dos certificados o dos ejecutables</b> con la misma firma: uno legítimo que firmas, otro malicioso que hereda esa firma. Así se propagó el malware <i>Flame</i> (2012).</p></div>
+      </div>
+
+      <div class="subhead">WEP · el WiFi que RC4 hundió</div>
+      <div class="card">
+        <h3>Reutilización de keystream en RC4</h3>
+        <p class="card-note">WEP cifraba con RC4 usando clave = <code>IV(24 bits) ‖ clave_fija</code>. Con sólo 24 bits, el IV se <b>repite</b> en horas de tráfico. Dos paquetes con el mismo IV = mismo keystream = dos textos "sumados". Reproducimos la fuga.</p>
+        <div class="btns"><button class="act" id="wep-run">Interceptar dos paquetes con IV repetido ▸</button></div>
+        <div class="out" id="wep-out"><span class="d">Escuchando la red…</span></div>
+        <div class="callout vuln"><h4>⚠ Vulnerabilidad · WEP (1997)</h4><p>IV demasiado corto y reutilizado, sin control de integridad real. Los ataques FMS (2001) y luego el chopchop/PTW permiten <b>recuperar la clave completa en minutos</b>. WEP quedó obsoleto.</p></div>
+        <div class="callout fix"><h4>✓ Mitigación</h4><p><b>WPA2/WPA3</b>: AES-CCMP/GCMP en vez de RC4, IV/nonces largos y sin reutilización, e integridad criptográfica de cada paquete.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ MITIGACIONES ============ -->
+    <section id="mitigaciones">
+      <div class="eyebrow">08 · Resumen de ingeniería</div>
+      <h2>Tabla de mitigaciones</h2>
+      <p class="lead">La misma idea recorre todo el laboratorio: los algoritmos modernos son sólidos; casi todos los desastres vienen de <b>usarlos mal</b>.</p>
+      <div class="wrapx" style="overflow-x:auto">
+      <table class="mit">
+        <thead><tr><th>Vector de ataque</th><th>Mala práctica</th><th>Mitigación estándar</th></tr></thead>
+        <tbody>
+          <tr><td>CPA / ECB</td><td>Modos deterministas sin IV</td><td>Cifrado probabilístico con IV aleatorio único</td></tr>
+          <tr><td>KPA / OTP reutilizado</td><td>Reutilizar keystream (clave, IV)</td><td>Nonce único por mensaje; nunca reusar el par (clave, IV)</td></tr>
+          <tr><td>CCA / Padding Oracle</td><td>AES-CBC con MAC separado o ausente</td><td><b>AEAD</b>: AES-GCM / ChaCha20-Poly1305 (verifica el tag primero)</td></tr>
+          <tr><td>Maleabilidad RSA</td><td>RSA "textbook" sin padding</td><td>RSA-OAEP (cifrar), RSA-PSS (firmar), o ECC</td></tr>
+          <tr><td>Timing attacks</td><td><code>==</code>, <code>strcmp()</code>, <code>memcmp()</code></td><td>Comparación en tiempo constante (<code>compare_digest</code>)</td></tr>
+          <tr><td>Potencia / Glitch</td><td>Ramas <code>if/else</code> según el secreto</td><td>Código branchless, enmascaramiento, blindaje hardware</td></tr>
+          <tr><td>Colisiones de hash</td><td>MD5 / SHA-1 para firmas o integridad</td><td>SHA-256+; contraseñas con bcrypt / scrypt / Argon2</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="lead" style="margin-top:26px;font-size:14px;color:var(--muted)">Cripto·Lab · material didáctico. Todo se ejecuta localmente en tu navegador; ningún dato sale de tu equipo. Usa este conocimiento sólo con sistemas propios o con autorización.</p>
+    </section>
+
+  </div>
+  </main>
+</div>
+
+<script>
+"use strict";
+const CJ = window.CryptoJS;
+const $ = s => document.querySelector(s);
+const enc = new TextEncoder(), dec = new TextDecoder();
+const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+/* ---------- byte utils ---------- */
+const toHex = u8 => Array.from(u8).map(b=>b.toString(16).padStart(2,'0')).join('');
+const fromHex = h => new Uint8Array(h.replace(/\s+/g,'').match(/../g).map(x=>parseInt(x,16)));
+const toB64 = u8 => btoa(String.fromCharCode(...u8));
+const fromB64 = b => new Uint8Array(atob(b).split('').map(c=>c.charCodeAt(0)));
+function u8ToWA(u8){const w=[];for(let i=0;i<u8.length;i++)w[i>>>2]|=u8[i]<<(24-(i%4)*8);return CJ.lib.WordArray.create(w,u8.length);}
+function waToU8(wa){const{words,sigBytes}=wa,u8=new Uint8Array(sigBytes);for(let i=0;i<sigBytes;i++)u8[i]=(words[i>>>2]>>>(24-(i%4)*8))&0xff;return u8;}
+const xor=(a,b)=>{const n=Math.min(a.length,b.length),o=new Uint8Array(n);for(let i=0;i<n;i++)o[i]=a[i]^b[i];return o;};
+function keyFromPass(pass){ // 128-bit key derived from passphrase via SHA-256 (demo)
+  return u8ToWA(waToU8(CJ.SHA256(pass)).slice(0,16));
+}
+function fmtMs(ms){return ms<1?ms.toFixed(3):ms.toFixed(2);}
+function timingChip(el,label,ms){el.innerHTML=`<div class="timing">⏱ <span>${label}</span> <b>${fmtMs(ms)} ms</b></div>`;}
+
+/* ================= THEME ================= */
+const root=document.documentElement;
+function paintTheme(){
+  const explicit=root.getAttribute('data-theme');
+  document.querySelectorAll('.theme-toggle button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.set===explicit ? 'true':'false'));
+}
+document.querySelectorAll('.theme-toggle button').forEach(b=>b.addEventListener('click',()=>{
+  root.setAttribute('data-theme',b.dataset.set);try{localStorage.setItem('cl-theme',b.dataset.set);}catch(e){}paintTheme();drawSPA();
+}));
+try{const t=localStorage.getItem('cl-theme');if(t)root.setAttribute('data-theme',t);}catch(e){}
+paintTheme();
+
+/* ================= SCROLLSPY ================= */
+const links=[...document.querySelectorAll('nav.toc a')];
+const spy=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){
+  links.forEach(l=>l.classList.toggle('active', l.getAttribute('href')==='#'+e.target.id));}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('section').forEach(s=>spy.observe(s));
+
+/* ================= 01 · SYMMETRIC AES ================= */
+async function aesGcmEnc(msg,pass){
+  const key=await crypto.subtle.importKey('raw',waToU8(CJ.SHA256(pass)),{name:'AES-GCM'},false,['encrypt']);
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(msg)));
+  const out=new Uint8Array(iv.length+ct.length);out.set(iv);out.set(ct,iv.length);return out;
+}
+async function aesGcmDec(buf,pass){
+  const key=await crypto.subtle.importKey('raw',waToU8(CJ.SHA256(pass)),{name:'AES-GCM'},false,['decrypt']);
+  const iv=buf.slice(0,12),ct=buf.slice(12);
+  return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct));
+}
+let symState={mode:null,payload:null};
+$('#s-enc').addEventListener('click',async()=>{
+  const msg=$('#s-msg').value,pass=$('#s-key').value,mode=$('#s-mode').value,out=$('#s-out');
+  try{
+    const t0=performance.now();let hex,iv='';
+    if(mode==='GCM'){const b=await aesGcmEnc(msg,pass);hex=toB64(b);symState={mode,payload:b};}
+    else{
+      const key=keyFromPass(pass);const opt={mode:CJ.mode[mode],padding:mode==='CTR'?CJ.pad.NoPadding:CJ.pad.Pkcs7};
+      if(mode!=='ECB'){const ivwa=CJ.lib.WordArray.random(16);opt.iv=ivwa;iv=CJ.enc.Hex.stringify(ivwa);}
+      const ct=CJ.AES.encrypt(CJ.enc.Utf8.parse(msg),key,opt);
+      hex=ct.ciphertext.toString(CJ.enc.Base64);symState={mode,payload:{ct:ct.ciphertext,iv:opt.iv}};
+    }
+    const t1=performance.now();
+    out.innerHTML=`<span class="lbl">Modo</span><span class="k">${mode==='GCM'?'AES-256-GCM (autenticado)':'AES-128-'+mode}</span>`+
+      (iv?`<span class="lbl">IV (público, va con el mensaje)</span><span class="d">${iv}</span>`:'')+
+      `<span class="lbl">Criptograma (base64)</span>${esc(hex)}`;
+    timingChip($('#s-time'),'cifrado',t1-t0);
+  }catch(e){out.innerHTML=`<span class="r">Error: ${esc(e.message)}</span>`;}
+});
+$('#s-dec').addEventListener('click',async()=>{
+  const pass=$('#s-key').value,out=$('#s-out');
+  if(!symState.payload){out.innerHTML='<span class="r">Primero cifra un mensaje.</span>';return;}
+  try{
+    const t0=performance.now();let msg;
+    if(symState.mode==='GCM'){msg=await aesGcmDec(symState.payload,pass);}
+    else{const key=keyFromPass(pass);const opt={mode:CJ.mode[symState.mode],padding:symState.mode==='CTR'?CJ.pad.NoPadding:CJ.pad.Pkcs7};
+      if(symState.payload.iv)opt.iv=symState.payload.iv;
+      msg=CJ.AES.decrypt({ciphertext:symState.payload.ct},key,opt).toString(CJ.enc.Utf8);}
+    const t1=performance.now();
+    out.innerHTML=`<span class="lbl">Descifrado ✓</span><span class="g">${esc(msg)||'(vacío o clave incorrecta)'}</span>`;
+    timingChip($('#s-time'),'descifrado',t1-t0);
+  }catch(e){out.innerHTML='<span class="r">✗ No se pudo descifrar: clave incorrecta o mensaje alterado (el tag GCM lo detecta).</span>';}
+});
+
+/* ---- ECB image demo ---- */
+function drawSource(ctx){
+  const c=ctx.canvas;ctx.fillStyle='#f0efe8';ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle='#1a1c22';
+  ctx.font='700 46px "IBM Plex Serif",serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  // padlock shape
+  ctx.beginPath();ctx.arc(75,58,26,Math.PI,2*Math.PI);ctx.lineWidth=13;ctx.strokeStyle='#1a1c22';ctx.stroke();
+  ctx.fillRect(44,58,62,52);
+  ctx.fillStyle='#f0efe8';ctx.fillRect(70,78,10,20);
+  ctx.fillStyle='#1a1c22';ctx.fillText('AES',75,132);
+}
+function encImage(mode){
+  const src=$('#cv-orig').getContext('2d');
+  const img=src.getImageData(0,0,150,150),d=img.data;
+  const rgb=new Uint8Array(150*150*3);for(let i=0,j=0;i<d.length;i+=4,j+=3){rgb[j]=d[i];rgb[j+1]=d[i+1];rgb[j+2]=d[i+2];}
+  const pad=(16-rgb.length%16)%16,buf=new Uint8Array(rgb.length+pad);buf.set(rgb);
+  const key=CJ.enc.Hex.parse('00112233445566778899aabbccddeeff');
+  const opt={mode:CJ.mode[mode],padding:CJ.pad.NoPadding};
+  if(mode==='CBC')opt.iv=CJ.enc.Hex.parse('0f1e2d3c4b5a69788796a5b4c3d2e1f0');
+  const ct=waToU8(CJ.AES.encrypt(u8ToWA(buf),key,opt).ciphertext);
+  const tgt=$(mode==='ECB'?'#cv-ecb':'#cv-cbc').getContext('2d');
+  const o=tgt.createImageData(150,150),od=o.data;
+  for(let i=0,j=0;i<od.length;i+=4,j+=3){od[i]=ct[j];od[i+1]=ct[j+1];od[i+2]=ct[j+2];od[i+3]=255;}
+  tgt.putImageData(o,0,0);
+}
+function initECB(){drawSource($('#cv-orig').getContext('2d'));['ecb','cbc'].forEach(id=>{const c=$('#cv-'+id).getContext('2d');c.fillStyle='#e9e7df';c.fillRect(0,0,150,150);c.fillStyle='#9a9a9a';c.font='12px monospace';c.textAlign='center';c.fillText('sin cifrar',75,78);});}
+$('#ecb-run').addEventListener('click',()=>{encImage('ECB');encImage('CBC');});
+initECB();
+
+/* ================= 02 · RSA ================= */
+let rsaKeys=null,rsaCipher=null;
+$('#rsa-gen').addEventListener('click',async()=>{
+  const out=$('#rsa-keys');out.innerHTML='<span class="d">Generando RSA-2048…</span>';
+  const t0=performance.now();
+  rsaKeys=await crypto.subtle.generateKey({name:'RSA-OAEP',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['encrypt','decrypt']);
+  const t1=performance.now();
+  const pub=new Uint8Array(await crypto.subtle.exportKey('spki',rsaKeys.publicKey));
+  out.innerHTML=`<span class="lbl">Clave pública de Alice (se comparte con todos)</span><span class="k">${toB64(pub).slice(0,120)}…</span>`+
+    `<span class="lbl">Clave privada de Alice</span><span class="r">🔒 nunca sale del navegador de Alice</span>`;
+  timingChip($('#rsa-time'),'generación del par',t1-t0);
+  $('#rsa-enc').disabled=false;
+});
+$('#rsa-enc').addEventListener('click',async()=>{
+  const out=$('#rsa-out');try{
+    const t0=performance.now();
+    rsaCipher=new Uint8Array(await crypto.subtle.encrypt({name:'RSA-OAEP'},rsaKeys.publicKey,enc.encode($('#rsa-msg').value)));
+    const t1=performance.now();
+    out.innerHTML=`<span class="lbl">Bob cifró con la pública de Alice → criptograma</span>${toB64(rsaCipher)}`;
+    timingChip($('#rsa-time'),'cifrado RSA',t1-t0);$('#rsa-dec').disabled=false;
+  }catch(e){out.innerHTML=`<span class="r">${esc(e.message)}</span>`;}
+});
+$('#rsa-dec').addEventListener('click',async()=>{
+  const out=$('#rsa-out');try{
+    const t0=performance.now();
+    const m=dec.decode(await crypto.subtle.decrypt({name:'RSA-OAEP'},rsaKeys.privateKey,rsaCipher));
+    const t1=performance.now();
+    out.innerHTML=`<span class="lbl">Alice descifró con su privada ✓</span><span class="g">${esc(m)}</span>`;
+    timingChip($('#rsa-time'),'descifrado RSA',t1-t0);
+  }catch(e){out.innerHTML=`<span class="r">${esc(e.message)}</span>`;}
+});
+
+/* ================= 03 · HASH ================= */
+const HASHES=[
+  {name:'MD5',fn:CJ.MD5,bits:128,broken:true},
+  {name:'SHA-1',fn:CJ.SHA1,bits:160,broken:true},
+  {name:'SHA-256',fn:CJ.SHA256,bits:256,broken:false},
+  {name:'SHA-512',fn:CJ.SHA512,bits:512,broken:false},
+];
+function renderHashes(){
+  const msg=$('#h-msg').value,grid=$('#h-grid');grid.innerHTML='';
+  HASHES.forEach(h=>{
+    const t0=performance.now();const d=h.fn(msg).toString();const t1=performance.now();
+    const row=document.createElement('div');row.className='hashrow';
+    row.innerHTML=`<div class="algo">${h.name} ${h.broken?'<span class="pill bad">roto</span>':'<span class="pill ok">ok</span>'}</div>`+
+      `<div class="digest">${d}</div><div class="tm">${fmtMs(t1-t0)} ms · ${h.bits} bits</div>`;
+    grid.appendChild(row);
+  });
+}
+$('#h-msg').addEventListener('input',renderHashes);renderHashes();
+
+function avalanche(){
+  const a=$('#av-a').value,b=$('#av-b').value;
+  const ha=CJ.SHA256(a).toString(),hb=CJ.SHA256(b).toString();
+  const A=waToU8(CJ.SHA256(a)),B=waToU8(CJ.SHA256(b));
+  let bitdiff=0;for(let i=0;i<A.length;i++){let x=A[i]^B[i];while(x){bitdiff+=x&1;x>>=1;}}
+  const mark=(h,other)=>[...h].map((c,i)=>c!==other[i]?`<span class="diff">${c}</span>`:c).join('');
+  $('#av-ha').innerHTML=mark(ha,hb);$('#av-hb').innerHTML=mark(hb,ha);
+  $('#av-stat').innerHTML=`⚡ <b>${bitdiff}</b>/256 bits distintos (${(bitdiff/256*100).toFixed(0)}%) por cambiar unos pocos caracteres`;
+}
+$('#av-a').addEventListener('input',avalanche);$('#av-b').addEventListener('input',avalanche);avalanche();
+
+/* ================= 04 · FILE ENCRYPTION ================= */
+let fileBytes=null,fileMeta=null,fileEnc=null;
+const fdrop=$('#f-drop');
+function loadFile(file){
+  fileMeta={name:file.name,type:file.type,size:file.size};
+  const r=new FileReader();r.onload=e=>{fileBytes=new Uint8Array(e.target.result);
+    $('#f-out').innerHTML=`<span class="lbl">Archivo cargado</span><span class="k">${esc(file.name)}</span> · ${file.size.toLocaleString()} bytes · ${esc(file.type||'binario')}`;
+    $('#f-enc').disabled=false;$('#f-dec').disabled=true;fileEnc=null;$('#f-preview').innerHTML='';$('#f-time').innerHTML='';};
+  r.readAsArrayBuffer(file);
+}
+$('#f-input').addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
+['dragover','dragenter'].forEach(ev=>fdrop.addEventListener(ev,e=>{e.preventDefault();fdrop.classList.add('hot');}));
+['dragleave','drop'].forEach(ev=>fdrop.addEventListener(ev,e=>{e.preventDefault();fdrop.classList.remove('hot');}));
+fdrop.addEventListener('drop',e=>{if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
+
+async function deriveKey(pass,salt,usage){
+  const base=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,usage);
+}
+$('#f-enc').addEventListener('click',async()=>{
+  if(!fileBytes)return;const out=$('#f-out');
+  try{
+    const t0=performance.now();
+    const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+    const key=await deriveKey($('#f-pass').value,salt,['encrypt']);
+    const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,fileBytes));
+    const blob=new Uint8Array(16+12+ct.length);blob.set(salt);blob.set(iv,16);blob.set(ct,28);fileEnc=blob;
+    const t1=performance.now();
+    out.innerHTML=`<span class="lbl">🔒 Cifrado con AES-256-GCM · clave por PBKDF2 (100k iter)</span>`+
+      `<span class="lbl">Sal ‖ IV (cabecera pública)</span><span class="d">${toHex(salt)} ${toHex(iv)}</span>`+
+      `<span class="lbl">Criptograma (${blob.length.toLocaleString()} bytes, hex truncado)</span>${toHex(ct).slice(0,220)}…`;
+    timingChip($('#f-time'),`cifrado de ${fileMeta.size.toLocaleString()} bytes`,t1-t0);
+    $('#f-dec').disabled=false;$('#f-preview').innerHTML='';
+  }catch(e){out.innerHTML=`<span class="r">${esc(e.message)}</span>`;}
+});
+$('#f-dec').addEventListener('click',async()=>{
+  if(!fileEnc)return;const out=$('#f-out');
+  try{
+    const t0=performance.now();
+    const salt=fileEnc.slice(0,16),iv=fileEnc.slice(16,28),ct=fileEnc.slice(28);
+    const key=await deriveKey($('#f-pass').value,salt,['decrypt']);
+    const plain=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct));
+    const t1=performance.now();
+    const ok=plain.length===fileBytes.length&&plain.every((b,i)=>b===fileBytes[i]);
+    out.innerHTML=`<span class="lbl">🔓 Descifrado ✓ · integridad GCM verificada</span><span class="g">Recuperados ${plain.length.toLocaleString()} bytes — ${ok?'idénticos al original ✓':'⚠ difieren'}</span>`;
+    timingChip($('#f-time'),'descifrado',t1-t0);
+    $('#f-preview').innerHTML='';
+    if(fileMeta.type.startsWith('image/')){const url=URL.createObjectURL(new Blob([plain],{type:fileMeta.type}));
+      $('#f-preview').innerHTML=`<div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:14px">Imagen recuperada desde el criptograma:</div><img class="fimg" src="${url}" alt="recuperada" />`;}
+  }catch(e){out.innerHTML='<span class="r">✗ Contraseña incorrecta o archivo manipulado — GCM rechaza el descifrado.</span>';}
+});
+
+/* ================= 05 · KPA ================= */
+$('#kpa-run').addEventListener('click',()=>{
+  const out=$('#kpa-out');
+  const known=$('#kpa-known').value;
+  const p1=known+"reunión el viernes a las 9.";
+  const p2="CONFIDENCIAL: cambio de plan, cancelado.";
+  const K=crypto.getRandomValues(new Uint8Array(Math.max(p1.length,p2.length)));
+  const P1=enc.encode(p1),P2=enc.encode(p2);
+  const C1=xor(P1,K),C2=xor(P2,K);
+  const kb=enc.encode(known);
+  const recovered=xor(C1.slice(0,kb.length),kb); // = K prefix
+  const p2rec=xor(C2.slice(0,kb.length),recovered);
+  out.innerHTML=
+    `<span class="lbl">C₁ interceptado (hex)</span><span class="d">${toHex(C1).slice(0,64)}…</span>`+
+    `<span class="lbl">C₂ interceptado — misma clave de flujo</span><span class="d">${toHex(C2).slice(0,64)}…</span>`+
+    `<span class="lbl">Eve conoce P₁[0..${kb.length}] = "${esc(known)}"</span>`+
+    `<span class="lbl">→ keystream recuperado  K = C₁ ⊕ P₁</span><span class="k">${toHex(recovered)}</span>`+
+    `<span class="lbl">→ aplica K sobre C₂ y lee el segundo mensaje secreto:</span><span class="g">"${esc(dec.decode(p2rec))}…"</span>`;
+});
+
+/* ================= 05 · CCA textbook RSA ================= */
+function modpow(b,e,m){b%=m;let r=1n;while(e>0n){if(e&1n)r=r*b%m;e>>=1n;b=b*b%m;}return r;}
+function egcd(a,b){let[o,r]=[1n,0n],[o2,r2]=[0n,1n];while(b){const q=a/b;[a,b]=[b,a-q*b];[o,o2]=[o2,o-q*o2];[r,r2]=[r2,r-q*r2];}return[a,o,r];}
+function modinv(a,m){let[g,x]=egcd((a%m+m)%m,m);if(g!==1n)throw'no inv';return(x%m+m)%m;}
+$('#cca-run').addEventListener('click',()=>{
+  const p=10007n,q=10009n,n=p*q,phi=(p-1n)*(q-1n),e=65537n,d=modinv(e,phi);
+  const m=1337n;                       // secreto de Alice
+  const c=modpow(m,e,n);               // Eve intercepta c
+  const factor=2n;
+  const cPrime=(modpow(factor,e,n)*c)%n; // Eve construye c' = 2^e · c
+  const mPrime=modpow(cPrime,d,n);      // el oráculo descifra c' → 2m
+  const recovered=mPrime/factor;        // Eve divide entre 2
+  $('#cca-out').innerHTML=
+    `<span class="lbl">Clave pública</span><span class="d">n=${n}  e=${e}</span>`+
+    `<span class="lbl">Secreto real de Alice (Eve NO lo conoce)</span><span class="r">m = ${m}</span>`+
+    `<span class="lbl">Criptograma interceptado</span><span class="d">c = ${c}</span>`+
+    `<span class="lbl">Eve construye c' = 2ᵉ·c mod n</span><span class="d">c' = ${cPrime}</span>`+
+    `<span class="lbl">El oráculo descifra c' y devuelve…</span><span class="k">m' = ${mPrime}  (= 2·m)</span>`+
+    `<span class="lbl">Eve divide entre 2 → mensaje robado</span><span class="g">m = ${recovered} ✓  (sin conocer d)</span>`;
+});
+
+/* ================= 06 · PADDING ORACLE ================= */
+let poKey,poC1,poIV,poSecret;
+function poSetup(){
+  poKey=CJ.lib.WordArray.random(16);
+  poSecret=enc.encode("MENSAJE_SECRET!!");        // exactamente 16 bytes
+  poIV=crypto.getRandomValues(new Uint8Array(16));
+  const inter=xor(poSecret,poIV);
+  poC1=aesEcbEnc(inter);                            // D(C1)=inter
+  $('#po-reveal').innerHTML='<span class="todo">'+'·'.repeat(16)+'</span>';
+  $('#po-out').innerHTML='<span class="d">Secreto nuevo cargado. El oráculo sólo dirá válido/ inválido.</span>';
+  $('#po-time').innerHTML='';
+}
+function aesEcbEnc(u8_16){return waToU8(CJ.AES.encrypt(u8ToWA(u8_16),poKey,{mode:CJ.mode.ECB,padding:CJ.pad.NoPadding}).ciphertext);}
+function aesEcbDec(u8_16){return waToU8(CJ.AES.decrypt({ciphertext:u8ToWA(u8_16)},poKey,{mode:CJ.mode.ECB,padding:CJ.pad.NoPadding}));}
+function validPad(block){const n=block[15];if(n<1||n>16)return false;for(let i=16-n;i<16;i++)if(block[i]!==n)return false;return true;}
+function oracle(prev){ // returns true if PKCS7 valid — the ONLY leak
+  const inter=aesEcbDec(poC1);const pt=xor(inter,prev);return validPad(pt);
+}
+async function poAttack(){
+  const out=$('#po-out');let queries=0;const inter=new Uint8Array(16);
+  const t0=performance.now();
+  for(let pad=1;pad<=16;pad++){
+    const idx=16-pad;let found=-1;
+    for(let g=0;g<256;g++){
+      const prev=new Uint8Array(16);
+      for(let j=idx+1;j<16;j++)prev[j]=inter[j]^pad;   // ya conocidos → forzar valor = pad
+      prev[idx]=g;queries++;
+      if(oracle(prev)){
+        if(pad===1){ // confirmar que es 0x01 y no un padding fortuito mayor
+          const t=prev.slice();t[14]^=0xff;if(!oracle(t))continue;
+        }
+        found=g;break;
+      }
+    }
+    inter[idx]=found^pad;
+    const partial=xor(inter,poIV);
+    // mostrar progreso (sólo los bytes ya resueltos, de derecha a izquierda)
+    let html='';for(let i=0;i<16;i++){const solved=i>=idx;const ch=solved?String.fromCharCode(partial[i]):'·';
+      html+=solved?`<span class="done">${esc(ch)}</span>`:`<span class="todo">·</span>`;}
+    $('#po-reveal').innerHTML=html;
+    out.innerHTML=`<span class="lbl">Consultas al oráculo</span><span class="k">${queries}</span>`+
+      `<span class="lbl">Byte ${16-idx}/16 recuperado</span><span class="g">'${esc(String.fromCharCode(partial[idx]))}'</span>`;
+    await new Promise(r=>setTimeout(r,90));
+  }
+  const t1=performance.now();
+  const full=dec.decode(xor(inter,poIV));
+  out.innerHTML+=`<span class="lbl">Texto plano completo — recuperado sin la clave</span><span class="g">"${esc(full)}"</span>`;
+  timingChip($('#po-time'),`${queries} consultas`,t1-t0);
+}
+$('#po-run').addEventListener('click',async e=>{e.target.disabled=true;await poAttack();e.target.disabled=false;});
+$('#po-reset').addEventListener('click',poSetup);
+poSetup();
+
+/* ================= 06 · TIMING ATTACK ================= */
+const TM_SECRET="K7pQ2xR";                 // token a recuperar
+const TM_ALPHABET="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+function insecureCompare(guess,secret){    // se detiene en el primer byte incorrecto
+  for(let i=0;i<secret.length;i++){
+    if(guess[i]!==secret[i])return false;
+    // "trabajo" por byte correcto → amplifica el tiempo medible
+    let s=0;for(let k=0;k<9000;k++)s+=Math.sqrt(k*(i+1))|0;if(s<0)return false;
+  }
+  return true;
+}
+async function timingAttack(){
+  const bars=$('#tm-bars'),reveal=$('#tm-reveal'),posEl=$('#tm-pos');
+  let recovered='';const t0=performance.now();
+  for(let pos=0;pos<TM_SECRET.length;pos++){
+    posEl.textContent=`Posición ${pos+1}/${TM_SECRET.length} — midiendo tiempo de cada candidato…`;
+    let best={ms:-1,ch:''};const results=[];
+    for(const ch of TM_ALPHABET){
+      const guess=(recovered+ch).padEnd(TM_SECRET.length,'\0');
+      let acc=0;const TRIALS=6;
+      for(let t=0;t<TRIALS;t++){const a=performance.now();insecureCompare(guess,TM_SECRET);acc+=performance.now()-a;}
+      const ms=acc/TRIALS;results.push({ch,ms});if(ms>best.ms)best={ms,ch};
+    }
+    recovered+=best.ch;
+    // dibujar barras (top candidatos por tiempo)
+    const max=Math.max(...results.map(r=>r.ms))||1;
+    results.sort((a,b)=>b.ms-a.ms);
+    bars.innerHTML=results.slice(0,8).map(r=>{
+      const win=r.ch===best.ch;
+      return `<div class="bar ${win?'win':''}"><span class="cand">${esc(r.ch)}</span>`+
+        `<span class="track"><span class="fill" style="width:${(r.ms/max*100).toFixed(0)}%"></span></span>`+
+        `<span class="ms">${r.ms.toFixed(3)}ms</span></div>`;
+    }).join('');
+    reveal.innerHTML=[...TM_SECRET].map((_,i)=>i<recovered.length?`<span class="done">${esc(recovered[i])}</span>`:'<span class="todo">·</span>').join('');
+    await new Promise(r=>setTimeout(r,180));
+  }
+  const t1=performance.now();
+  posEl.textContent=`Token recuperado carácter a carácter, sólo por diferencias de tiempo.`;
+  timingChip($('#tm-time'),'ataque completo',t1-t0);
+}
+$('#tm-run').addEventListener('click',async e=>{e.target.disabled=true;$('#tm-reveal').innerHTML='<span class="todo">·······</span>';await timingAttack();e.target.disabled=false;});
+
+/* ================= 06 · SPA POWER TRACE ================= */
+const SPA_KEY=[1,0,1,1,0,0,1,0,1,1,1,0,0,1,0,1];
+function drawSPA(){
+  const cv=$('#spa'),ctx=cv.getContext('2d');const W=cv.width,H=cv.height;
+  const cs=getComputedStyle(document.body);
+  const ink=cs.getPropertyValue('--ink').trim(),acc=cs.getPropertyValue('--accent').trim(),
+        line=cs.getPropertyValue('--line').trim(),surf=cs.getPropertyValue('--surface-2').trim(),
+        muted=cs.getPropertyValue('--muted').trim();
+  ctx.fillStyle=surf;ctx.fillRect(0,0,W,H);
+  // grid
+  ctx.strokeStyle=line;ctx.lineWidth=1;for(let y=30;y<H;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  const base=H-34,amp=70;let x=14;const seg=(W-28)/SPA_KEY.length;
+  ctx.strokeStyle=acc;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,base);
+  const centers=[];
+  SPA_KEY.forEach((bit)=>{
+    const w=seg;const spikes=bit?2:1;const sw=w/(spikes+.6);
+    for(let s=0;s<spikes;s++){const cx=x+sw*(s+0.7);
+      ctx.lineTo(cx-sw*0.35,base);ctx.lineTo(cx,base-amp);ctx.lineTo(cx+sw*0.35,base);}
+    centers.push(x+w/2);x+=w;ctx.lineTo(x,base);
+  });
+  ctx.stroke();
+  // bit labels
+  ctx.fillStyle=muted;ctx.font='11px "IBM Plex Mono",monospace';ctx.textAlign='center';
+  SPA_KEY.forEach((bit,i)=>{ctx.fillStyle=bit?acc:muted;ctx.fillText(bit?'1':'0',centers[i],H-10);
+    ctx.fillStyle=muted;ctx.fillText(bit?'D+A':'D',centers[i],20);});
+  cv._seg=seg;cv._centers=centers;
+}
+$('#spa').addEventListener('mousemove',e=>{
+  const cv=$('#spa'),r=cv.getBoundingClientRect();const x=(e.clientX-r.left)*(cv.width/r.width);
+  const i=Math.min(SPA_KEY.length-1,Math.max(0,Math.floor((x-14)/cv._seg)));
+  const read=SPA_KEY.map((b,j)=>j===i?`<b style="color:var(--accent)">${b}</b>`:b).join('');
+  $('#spa-bits').innerHTML=read+`  &nbsp;·&nbsp; bit ${i+1} = ${SPA_KEY[i]} (${SPA_KEY[i]?'doblar y sumar':'sólo doblar'})`;
+});
+$('#spa-bits').textContent=SPA_KEY.join('');
+drawSPA();
+
+/* ================= 07 · MD5 COLLISION ================= */
+const MD5_A="d131dd02c5e6eec4693d9a0698aff95c2fcab58712467eab4004583eb8fb7f8955ad340609f4b30283e488832571415a085125e8f7cdc99fd91dbdf280373c5bd8823e3156348f5bae6dacd436c919c6dd53e2b487da03fd02396306d248cda0e99f33420f577ee8ce54b67080a80d1ec69821bcb6a8839396f9652b6ff72a70";
+const MD5_B="d131dd02c5e6eec4693d9a0698aff95c2fcab50712467eab4004583eb8fb7f8955ad340609f4b30283e4888325f1415a085125e8f7cdc99fd91dbd7280373c5bd8823e3156348f5bae6dacd436c919c6dd53e23487da03fd02396306d248cda0e99f33420f577ee8ce54b67080280d1ec69821bcb6a8839396f965ab6ff72a70";
+function md5OfHex(hex){return CJ.MD5(CJ.enc.Hex.parse(hex)).toString();}
+function markDiff(a,b){return[...a].map((c,i)=>c!==b[i]?`<span style="color:var(--danger);font-weight:600">${c}</span>`:`<span class="d">${c}</span>`).join('');}
+$('#md5-run').addEventListener('click',()=>{
+  const ha=md5OfHex(MD5_A),hb=md5OfHex(MD5_B);const same=ha===hb;
+  $('#md5-out').innerHTML=
+    `<span class="lbl">Mensaje 1 (128 bytes, difs en rojo)</span><div style="font-size:11px">${markDiff(MD5_A,MD5_B)}</div>`+
+    `<span class="lbl">Mensaje 2 (128 bytes)</span><div style="font-size:11px">${markDiff(MD5_B,MD5_A)}</div>`+
+    `<span class="lbl">MD5(Mensaje 1)</span><span class="k">${ha}</span>`+
+    `<span class="lbl">MD5(Mensaje 2)</span><span class="k">${hb}</span>`+
+    `<span class="lbl">Resultado</span>${same?'<span class="g">✓ COLISIÓN — dos entradas distintas, la misma huella MD5</span>':'<span class="r">no coinciden</span>'}`;
+});
+
+/* ================= 07 · WEP / RC4 ================= */
+$('#wep-run').addEventListener('click',()=>{
+  const iv="A7:3F:01";                       // IV de 24 bits que se repite
+  const wepKey="clave-wifi";
+  const seed=iv+wepKey;
+  const p1="GET /login?user=alice HTTP/1.1";
+  const p2="GET /admin?token=SECRETO HTTP";
+  const ks=n=>waToU8(CJ.RC4.encrypt(u8ToWA(new Uint8Array(n)),CJ.enc.Utf8.parse(seed)).ciphertext); // keystream = RC4(0…0)
+  const K=ks(Math.max(p1.length,p2.length));
+  const c1=xor(enc.encode(p1),K),c2=xor(enc.encode(p2),K);
+  // Eve conoce la cabecera fija "GET /" y recupera keystream, luego lee ambos
+  const known=enc.encode("GET /");
+  const krec=xor(c1.slice(0,known.length),known);
+  const c1c2=xor(c1,c2); // P1 ⊕ P2, ya filtra info aunque no se conozca K
+  $('#wep-out').innerHTML=
+    `<span class="lbl">Paquete 1 · IV=${iv} (RC4 keystream K)</span><span class="d">${toHex(c1).slice(0,54)}…</span>`+
+    `<span class="lbl">Paquete 2 · IV=${iv} ¡mismo IV! → mismo K</span><span class="d">${toHex(c2).slice(0,54)}…</span>`+
+    `<span class="lbl">C₁ ⊕ C₂ = P₁ ⊕ P₂ (la clave se cancela)</span><span class="k">${toHex(c1c2).slice(0,54)}…</span>`+
+    `<span class="lbl">Con la cabecera fija "GET /" Eve recupera K y descifra todo:</span>`+
+    `<span class="g">P₁ = "${esc(dec.decode(xor(c1,K)))}"</span>`+
+    `<span class="g">P₂ = "${esc(dec.decode(xor(c2,K)))}"</span>`;
+});
+</script>
