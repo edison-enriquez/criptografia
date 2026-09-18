@@ -195,6 +195,23 @@
   .avax{font-family:var(--font-mono);font-size:12.5px;word-break:break-all;line-height:1.7;margin-top:6px}
   .avax .diff{background:var(--danger);color:#fff;border-radius:2px;padding:0 1px}
 
+  /* security services */
+  .services{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+  .svc-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+  .svc{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 11px 3px 9px;border-radius:999px;border:1px solid var(--line-strong)}
+  .svc::before{font-family:var(--font-mono);font-weight:700;font-size:10.5px}
+  .svc.yes{color:var(--secure);border-color:var(--secure);background:var(--secure-soft)}
+  .svc.yes::before{content:"✓"}
+  .svc.no{color:var(--muted);background:var(--surface-2)}
+  .svc.no::before{content:"✕";opacity:.65}
+  .svc-note{width:100%;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+  .svc-defs{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px}
+  .svc-defs>div{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:11px 13px;display:flex;flex-direction:column;gap:3px}
+  .svc-defs b{font-size:13.5px;display:flex;align-items:center;gap:8px}
+  .svc-defs b::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--secure);flex:0 0 auto}
+  .svc-defs span{font-size:12.5px;color:var(--muted);line-height:1.5}
+  @media (max-width:560px){.svc-defs{grid-template-columns:1fr}}
+
   .steps{display:flex;flex-direction:column;gap:0;margin-top:8px;counter-reset:s}
   .step{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
   .step:last-child{border-bottom:none}
@@ -279,6 +296,17 @@
           <div class="step"><span class="n">03</span><div><b>Funciones hash</b> — una <b>huella digital de una sola vía</b>: comprueban integridad y guardan contraseñas, pero <b>no cifran</b> (no se pueden invertir).</div></div>
         </div>
       </div>
+
+      <div class="card">
+        <h3>¿Qué significa "proteger"? — los cuatro servicios de seguridad</h3>
+        <p class="card-note">En cada algoritmo verás estas etiquetas. Lo importante es que <b>casi ningún algoritmo ofrece todo por sí solo</b>: se combinan según lo que necesites.</p>
+        <div class="svc-defs">
+          <div><b>Confidencialidad</b><span>Que nadie no autorizado pueda leer el contenido. La aporta el <b>cifrado</b> (AES, RSA-OAEP).</span></div>
+          <div><b>Integridad</b><span>Detectar si el mensaje fue alterado por el camino. La aportan <b>hash, MAC y AEAD</b>.</span></div>
+          <div><b>Autenticidad</b><span>Verificar quién es realmente el origen del mensaje. La aportan <b>HMAC y las firmas digitales</b>.</span></div>
+          <div><b>No repudio</b><span>Que el emisor no pueda negar después haberlo enviado. Solo con <b>firma de clave privada</b>.</span></div>
+        </div>
+      </div>
     </section>
 
     <!-- ============ SIMÉTRICO ============ -->
@@ -311,6 +339,14 @@
         </div>
         <div class="out" id="s-out"><span class="d">El criptograma aparecerá aquí…</span></div>
         <div id="s-time"></div>
+        <div class="services">
+          <span class="svc-label">Qué protege · AES-GCM</span>
+          <span class="svc yes">Confidencialidad</span>
+          <span class="svc yes">Integridad</span>
+          <span class="svc yes">Autenticidad</span>
+          <span class="svc no">No repudio</span>
+          <span class="svc-note"><b>Confidencialidad</b> siempre. <b>Integridad y autenticidad</b> solo con AEAD (GCM); en CBC/CTR/ECB no las hay. <b>No repudio no</b>: como la clave es compartida, Bob no puede probar ante un tercero que el mensaje lo escribió Alice y no él mismo.</span>
+        </div>
       </div>
 
       <div class="card">
@@ -360,6 +396,21 @@
         </div>
         <div class="out" id="rsa-out"><span class="d">Genera primero las claves.</span></div>
         <div id="rsa-time"></div>
+        <div class="services">
+          <span class="svc-label">RSA-OAEP · cifrar</span>
+          <span class="svc yes">Confidencialidad</span>
+          <span class="svc no">Integridad</span>
+          <span class="svc no">Autenticidad</span>
+          <span class="svc no">No repudio</span>
+        </div>
+        <div class="services" style="border-top:none;padding-top:2px">
+          <span class="svc-label">RSA-PSS · firmar</span>
+          <span class="svc no">Confidencialidad</span>
+          <span class="svc yes">Integridad</span>
+          <span class="svc yes">Autenticidad</span>
+          <span class="svc yes">No repudio</span>
+          <span class="svc-note">Cifrar con la clave <b>pública</b> da <b>confidencialidad</b>. Para <b>integridad, autenticidad y no repudio</b> se <b>firma</b> con la clave <b>privada</b> (RSA-PSS): solo Alice pudo firmar y cualquiera lo verifica con su pública — por eso luego no puede negarlo.</span>
+        </div>
       </div>
 
       <div class="explain">
@@ -388,6 +439,14 @@
         <div class="field"><label for="h-msg">Entrada</label>
           <textarea id="h-msg" style="min-height:52px">Alice</textarea></div>
         <div class="hashgrid" id="h-grid"></div>
+        <div class="services">
+          <span class="svc-label">Qué protege · Hash</span>
+          <span class="svc no">Confidencialidad</span>
+          <span class="svc yes">Integridad</span>
+          <span class="svc no">Autenticidad</span>
+          <span class="svc no">No repudio</span>
+          <span class="svc-note">Un hash <b>no cifra</b>, así que no da confidencialidad: solo prueba <b>integridad</b> —si un bit cambia, la huella cambia por completo—. Con una clave secreta (<b>HMAC</b>) aporta además <b>autenticidad</b>.</span>
+        </div>
       </div>
 
       <div class="card">
@@ -439,6 +498,14 @@
         <div class="out" id="f-out"><span class="d">Selecciona un archivo para empezar…</span></div>
         <div id="f-time"></div>
         <div id="f-preview"></div>
+        <div class="services">
+          <span class="svc-label">Qué protege · AES-256-GCM</span>
+          <span class="svc yes">Confidencialidad</span>
+          <span class="svc yes">Integridad</span>
+          <span class="svc yes">Autenticidad</span>
+          <span class="svc no">No repudio</span>
+          <span class="svc-note">El fichero queda ilegible (<b>confidencialidad</b>) y el tag GCM detecta cualquier manipulación (<b>integridad</b> y <b>autenticidad</b> respecto a quien conoce la contraseña). <b>No repudio no</b>: la contraseña es compartida.</span>
+        </div>
       </div>
       <div class="explain">
         <h4>Nota didáctica</h4>
