@@ -212,6 +212,56 @@
   .svc-defs span{font-size:12.5px;color:var(--muted);line-height:1.5}
   @media (max-width:560px){.svc-defs{grid-template-columns:1fr}}
 
+  /* nav groups */
+  .toc-group{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--line-strong);margin:15px 0 4px 9px}
+  .toc-group:first-child{margin-top:0}
+
+  /* Alice/Bob/Eve panels */
+  .ab{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .pcol{border:1px solid var(--line);border-top-width:3px;border-radius:9px;padding:14px;background:var(--surface-2)}
+  .pcol.alice{border-top-color:#B0447B}.pcol.bob{border-top-color:#2E6CA6}.pcol.eve{border-top-color:#B3462F}
+  .pcol h4{font-family:var(--font-sans);font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .pcol h4 .av{width:24px;height:24px;font-size:11px}
+  .pcol .kv{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin:5px 0;word-break:break-all;line-height:1.5}
+  .pcol .kv b{color:var(--ink);font-weight:600}
+  @media (max-width:620px){.ab{grid-template-columns:1fr}}
+
+  /* chain of trust */
+  .chain{display:flex;flex-direction:column;gap:0;margin-top:16px}
+  .chain .node{display:flex;gap:12px;align-items:flex-start}
+  .chain .badge{flex:0 0 auto;width:40px;height:40px;border-radius:9px;display:grid;place-items:center;font-size:19px;border:1px solid var(--line-strong);background:var(--surface-2)}
+  .chain .node.root .badge{border-color:var(--secure)}
+  .chain .node.leaf .badge{border-color:var(--accent)}
+  .chain .body .t{font-weight:600;font-size:14px}
+  .chain .body .s{font-size:12.5px;color:var(--muted)}
+  .chain .link{font-family:var(--font-mono);font-size:10.5px;color:var(--accent-2);margin:3px 0 3px 52px;display:flex;align-items:center;gap:6px}
+  .chain .link::before{content:"↓";font-size:14px}
+
+  /* X.509 certificate */
+  .cert{font-family:var(--font-mono);font-size:11.5px;line-height:1.7;background:var(--console-bg);color:var(--console-ink);border:1px solid var(--console-line);border-radius:9px;padding:14px 16px;margin-top:14px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  .cert .fld{color:#8a94a6}.cert .val{color:#d8e0c8}.cert .em{color:var(--accent)}
+  .cert .sec{color:var(--accent);border-top:1px solid var(--console-line);margin-top:9px;padding-top:9px;display:block;font-weight:600}
+
+  /* protocol flow */
+  .flow{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .flow .msg{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:start}
+  .flow .dir{font-family:var(--font-mono);font-size:10.5px;color:var(--accent);padding-top:9px;letter-spacing:.02em}
+  .flow .box{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 13px;font-size:13px}
+  .flow .box .prim{font-family:var(--font-mono);font-size:10px;color:var(--secure);text-transform:uppercase;letter-spacing:.06em;margin-top:6px;display:inline-block;background:var(--secure-soft);padding:2px 8px;border-radius:999px}
+  @media (max-width:560px){.flow .msg{grid-template-columns:1fr;gap:4px}.flow .dir{padding-top:0}}
+
+  /* command reference */
+  .cmd{background:var(--console-bg);color:var(--console-ink);border:1px solid var(--console-line);border-radius:8px;padding:14px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.75;overflow-x:auto;margin-top:4px;white-space:pre}
+  .cmd .c{color:#7f8896}.cmd .p{color:var(--accent)}.cmd .s{color:#7fc9a6}
+
+  /* PGP envelope */
+  .env{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+  .env .piece{display:grid;grid-template-columns:200px 1fr;gap:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 13px}
+  .env .piece .n{font-family:var(--font-mono);font-size:11.5px;color:var(--accent-2);font-weight:600}
+  .env .piece .hint{font-size:11px;color:var(--muted)}
+  .env .piece .v{font-family:var(--font-mono);font-size:11px;color:var(--muted);word-break:break-all;align-self:center}
+  @media (max-width:560px){.env .piece{grid-template-columns:1fr;gap:4px}}
+
   .steps{display:flex;flex-direction:column;gap:0;margin-top:8px;counter-reset:s}
   .step{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
   .step:last-child{border-bottom:none}
@@ -239,6 +289,7 @@
     nav.toc{flex-direction:row;gap:2px;flex:1;overflow-x:auto}
     nav.toc a{white-space:nowrap;padding:6px 10px}
     nav.toc a .num{display:none}
+    nav.toc .toc-group{display:none}
     .theme-toggle{margin-top:0;flex:0 0 auto}
     .theme-toggle button span{display:none}
     .wrap{padding-block:32px 80px}
@@ -256,15 +307,23 @@
       </div>
     </div>
     <nav class="toc" id="toc">
+      <div class="toc-group">Fundamentos</div>
       <a href="#intro"><span class="num">00</span> Introducción</a>
       <a href="#simetrico"><span class="num">01</span> Cifrado simétrico</a>
-      <a href="#asimetrico"><span class="num">02</span> Cifrado asimétrico</a>
-      <a href="#hash"><span class="num">03</span> Funciones hash</a>
-      <a href="#archivos"><span class="num">04</span> Cifrar archivos</a>
-      <a href="#criptoanalisis"><span class="num">05</span> Criptoanálisis</a>
-      <a href="#implementacion"><span class="num">06</span> Ataques de implementación</a>
-      <a href="#historia"><span class="num">07</span> Fallos históricos</a>
-      <a href="#mitigaciones"><span class="num">08</span> Mitigaciones</a>
+      <a href="#asimetrico"><span class="num">02</span> Asimétrico · RSA</a>
+      <a href="#dh"><span class="num">03</span> Claves · Diffie-Hellman</a>
+      <a href="#hash"><span class="num">04</span> Funciones hash</a>
+      <div class="toc-group">Confianza e infraestructura</div>
+      <a href="#firma"><span class="num">05</span> Firma digital</a>
+      <a href="#pki"><span class="num">06</span> PKI y certificados</a>
+      <a href="#protocolos"><span class="num">07</span> Protocolos · TLS · PGP</a>
+      <a href="#estego"><span class="num">08</span> Esteganografía</a>
+      <a href="#archivos"><span class="num">09</span> Cifrar archivos</a>
+      <div class="toc-group">Ataques y defensa</div>
+      <a href="#criptoanalisis"><span class="num">10</span> Criptoanálisis</a>
+      <a href="#implementacion"><span class="num">11</span> Ataques de implementación</a>
+      <a href="#historia"><span class="num">12</span> Fallos históricos</a>
+      <a href="#mitigaciones"><span class="num">13</span> Mitigaciones</a>
     </nav>
     <div class="theme-toggle" role="group" aria-label="Tema">
       <button data-set="light" aria-pressed="false">☀︎ <span>Claro</span></button>
@@ -312,24 +371,31 @@
     <!-- ============ SIMÉTRICO ============ -->
     <section id="simetrico">
       <div class="eyebrow">01 · Una sola clave secreta</div>
-      <h2>Cifrado simétrico — AES</h2>
-      <p class="lead">La misma clave cifra y descifra. AES (Advanced Encryption Standard) es el estándar mundial: trabaja en bloques de 16 bytes. Lo interesante —y peligroso— es el <b>modo de operación</b> que encadena esos bloques.</p>
+      <h2>Cifrado simétrico — DES · 3DES · AES</h2>
+      <p class="lead">La misma clave cifra y descifra. Son <b>cifradores de bloque</b>: DES (1977) fue el primer estándar, 3DES lo reforzó y AES lo reemplazó. Lo interesante —y peligroso— es el <b>modo de operación</b> que encadena los bloques.</p>
 
       <div class="card">
-        <h3>Banco de pruebas AES</h3>
-        <p class="card-note">Escribe un mensaje, elige una clave y un modo. Verás el criptograma y el tiempo de ejecución. GCM es cifrado autenticado (recomendado); ECB es deliberadamente inseguro para que veas por qué.</p>
+        <h3>Banco de pruebas de cifradores de bloque</h3>
+        <p class="card-note">Elige algoritmo (DES/3DES/AES), clave y modo. Verás el criptograma y el tiempo de ejecución. GCM (solo AES) es cifrado autenticado y recomendado; ECB es deliberadamente inseguro para que veas por qué.</p>
         <div class="field">
           <label for="s-msg">Mensaje de Alice</label>
           <textarea id="s-msg">Nos vemos a medianoche en el puente. — Alice</textarea>
         </div>
         <div class="row">
+          <div class="field" style="flex:0 0 120px"><label for="s-algo">Algoritmo</label>
+            <select id="s-algo">
+              <option value="AES">AES</option>
+              <option value="TDES">3DES</option>
+              <option value="DES">DES</option>
+            </select>
+          </div>
           <div class="field"><label for="s-key">Clave / contraseña</label><input type="text" id="s-key" value="clave-compartida-2026" /></div>
-          <div class="field" style="flex:0 0 150px"><label for="s-mode">Modo</label>
+          <div class="field" style="flex:0 0 140px"><label for="s-mode">Modo</label>
             <select id="s-mode">
-              <option value="GCM">AES-GCM (autenticado ✓)</option>
-              <option value="CBC">AES-CBC + IV</option>
-              <option value="CTR">AES-CTR (flujo)</option>
-              <option value="ECB">AES-ECB (inseguro)</option>
+              <option value="GCM">GCM (autenticado ✓)</option>
+              <option value="CBC">CBC + IV</option>
+              <option value="CTR">CTR (flujo)</option>
+              <option value="ECB">ECB (inseguro)</option>
             </select>
           </div>
         </div>
@@ -347,6 +413,22 @@
           <span class="svc no">No repudio</span>
           <span class="svc-note"><b>Confidencialidad</b> siempre. <b>Integridad y autenticidad</b> solo con AEAD (GCM); en CBC/CTR/ECB no las hay. <b>No repudio no</b>: como la clave es compartida, Bob no puede probar ante un tercero que el mensaje lo escribió Alice y no él mismo.</span>
         </div>
+      </div>
+
+      <div class="card">
+        <h3>Cifradores de bloque: DES · 3DES · AES</h3>
+        <p class="card-note">Los tres cifran en bloques con una clave secreta compartida. La diferencia está en su edad, el tamaño de clave y si siguen siendo seguros.</p>
+        <div class="wrapx" style="overflow-x:auto">
+        <table class="mit">
+          <thead><tr><th>Algoritmo</th><th>Año</th><th>Bloque</th><th>Clave</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>DES</td><td>1977</td><td>64 bits</td><td>56 bits</td><td><span class="pill bad">roto</span> fuerza bruta en horas</td></tr>
+            <tr><td>3DES</td><td>1998</td><td>64 bits</td><td>112–168 bits</td><td><span class="pill">obsoleto</span> lento; retirado por NIST</td></tr>
+            <tr><td>AES</td><td>2001</td><td>128 bits</td><td>128/192/256 bits</td><td><span class="pill ok">estándar</span> sin ataques prácticos</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="callout vuln"><h4>⚠ Por qué DES cayó</h4><p>Sus <b>56 bits</b> de clave son solo ~7·10¹⁶ combinaciones: hoy se agotan por fuerza bruta. 3DES aplica DES tres veces para agrandar la clave, pero hereda el bloque de 64 bits (vulnerable al ataque <i>Sweet32</i>) y es lento. AES los reemplazó a ambos.</p></div>
       </div>
 
       <div class="card">
@@ -427,9 +509,49 @@
       </div>
     </section>
 
+    <!-- ============ DIFFIE-HELLMAN ============ -->
+    <section id="dh">
+      <div class="eyebrow">03 · Acordar un secreto en público</div>
+      <h2>Intercambio de claves — Diffie-Hellman</h2>
+      <p class="lead">El cifrado simétrico es rápido pero exige una clave compartida. ¿Cómo la acuerdan Alice y Bob si Eve escucha todo el canal? Diffie-Hellman (1976) lo logra: ambos derivan el <b>mismo secreto</b> sin enviarlo jamás.</p>
+
+      <div class="card">
+        <h3>Deriva el secreto compartido</h3>
+        <p class="card-note">Los parámetros públicos <code>p</code> (primo) y <code>g</code> (generador) los ve todo el mundo. Cada uno elige un exponente <b>privado</b> y solo se intercambian <code>A</code> y <code>B</code>; el secreto nunca viaja.</p>
+        <div class="row">
+          <div class="field" style="flex:0 0 90px"><label for="dh-p">p · primo</label><input type="text" id="dh-p" value="23" /></div>
+          <div class="field" style="flex:0 0 90px"><label for="dh-g">g · gen.</label><input type="text" id="dh-g" value="5" /></div>
+          <div class="field" style="flex:0 0 140px"><label for="dh-a">a · privado Alice</label><input type="text" id="dh-a" value="6" /></div>
+          <div class="field" style="flex:0 0 140px"><label for="dh-b">b · privado Bob</label><input type="text" id="dh-b" value="15" /></div>
+        </div>
+        <div class="btns"><button class="act" id="dh-run">Ejecutar intercambio ▸</button></div>
+        <div class="ab" id="dh-ab"></div>
+        <div class="out" id="dh-out"><span class="d">Pulsa para ejecutar el protocolo…</span></div>
+      </div>
+
+      <div class="explain">
+        <h4>Por qué Eve no puede</h4>
+        <p>Eve ve <code>p</code>, <code>g</code>, <code>A = gᵃ mod p</code> y <code>B = gᵇ mod p</code>. Para obtener el secreto necesitaría <code>a</code> o <code>b</code>, es decir, resolver el <b>logaritmo discreto</b> — inviable con primos de 2048+ bits. Aquí usamos números pequeños solo para que veas la aritmética.</p>
+      </div>
+      <div class="callout vuln">
+        <h4>⚠ Vulnerabilidad · Man-in-the-Middle</h4>
+        <p>DH <b>por sí solo no autentica</b>: Eve puede colocarse en medio, hacer un DH con Alice y otro con Bob, y leerlo todo. Por eso DH siempre se combina con <b>firma o certificados</b> — justo lo que hace TLS.</p>
+      </div>
+      <div class="callout fix">
+        <h4>✓ En la práctica</h4>
+        <p>Hoy se usa <b>ECDH / X25519</b> (curvas elípticas) en modo <b>efímero (ECDHE)</b>: una clave nueva por sesión para tener <i>forward secrecy</i> — si roban la clave a largo plazo, no pueden descifrar las sesiones pasadas.</p>
+        <div class="services">
+          <span class="svc-label">Qué aporta · D-H</span>
+          <span class="svc yes">Confidencialidad</span><span class="svc no">Integridad</span>
+          <span class="svc no">Autenticidad</span><span class="svc no">No repudio</span>
+          <span class="svc-note">Establece una clave secreta para cifrar (base de la <b>confidencialidad</b>), pero <b>no autentica</b> a nadie: necesita firmas o certificados por encima.</span>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ HASH ============ -->
     <section id="hash">
-      <div class="eyebrow">03 · Huella de una sola vía</div>
+      <div class="eyebrow">04 · Huella de una sola vía</div>
       <h2>Funciones hash</h2>
       <p class="lead">Un hash convierte cualquier entrada en una huella de tamaño fijo. Es de <b>una sola vía</b>: es fácil calcular el hash de un mensaje, pero inviable reconstruir el mensaje a partir del hash. No cifra: sirve para <b>integridad</b> y para guardar contraseñas.</p>
 
@@ -477,9 +599,177 @@
       </div>
     </section>
 
+    <!-- ============ FIRMA DIGITAL ============ -->
+    <section id="firma">
+      <div class="eyebrow">05 · Probar quién lo escribió</div>
+      <h2>Firma digital</h2>
+      <p class="lead">Cifrar oculta el contenido; <b>firmar</b> hace lo contrario: no lo oculta, pero garantiza <b>quién</b> lo escribió y que <b>nadie lo alteró</b>. Es la operación inversa al cifrado asimétrico: Alice firma con su clave <b>privada</b> y cualquiera verifica con su <b>pública</b>.</p>
+
+      <div class="card">
+        <h3>Firma y verificación (RSA-PSS real)</h3>
+        <p class="card-note">Se firma el <b>hash</b> del documento. Edítalo después de firmar y la verificación fallará: eso es la integridad en acción.</p>
+        <div class="btns"><button class="act" id="fd-gen">① Alice genera su par de firma</button></div>
+        <div class="out" id="fd-keys"><span class="d">Sin claves aún…</span></div>
+        <hr class="soft" />
+        <div class="field"><label for="fd-msg">② Documento a firmar</label><textarea id="fd-msg">Yo, Alice, autorizo la transferencia de 500 € a Bob.</textarea></div>
+        <div class="btns">
+          <button class="act" id="fd-sign" disabled>Alice firma ✍</button>
+          <button class="ghost" id="fd-verify" disabled>Bob verifica</button>
+          <button class="ghost" id="fd-tamper" disabled>Eve altera el documento</button>
+        </div>
+        <div class="out" id="fd-out"><span class="d">Genera las claves para empezar.</span></div>
+        <div class="services">
+          <span class="svc-label">Qué protege · Firma</span>
+          <span class="svc no">Confidencialidad</span><span class="svc yes">Integridad</span>
+          <span class="svc yes">Autenticidad</span><span class="svc yes">No repudio</span>
+          <span class="svc-note">No cifra (el documento sigue legible), pero prueba que fue <b>Alice</b> (autenticidad), que <b>no se modificó</b> (integridad) y que <b>no puede negarlo</b> (no repudio). Es la base de los certificados, TLS y PGP.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PKI ============ -->
+    <section id="pki">
+      <div class="eyebrow">06 · ¿De quién es esta clave pública?</div>
+      <h2>PKI, certificados y entidades certificadoras</h2>
+      <p class="lead">La firma resuelve el "quién", pero queda una pregunta: ¿cómo sé que <i>esta</i> clave pública es de verdad del banco y no de Eve? La <b>Infraestructura de Clave Pública (PKI)</b> lo resuelve con <b>certificados</b> firmados por <b>Autoridades de Certificación (CA)</b> en las que ya confías.</p>
+
+      <div class="card">
+        <h3>La cadena de confianza</h3>
+        <p class="card-note">Tu navegador trae de fábrica las claves de las CA raíz. Cada eslabón <b>firma</b> al siguiente; si la firma valida hasta una raíz de confianza, el certificado es legítimo.</p>
+        <div class="chain">
+          <div class="node root"><div class="badge">🏛️</div><div class="body"><div class="t">CA Raíz — «Cripto·Lab Root CA»</div><div class="s">De confianza por defecto en el navegador. Se firma a sí misma.</div></div></div>
+          <div class="link">firma el certificado de la</div>
+          <div class="node"><div class="badge">🏢</div><div class="body"><div class="t">CA Intermedia — «Cripto·Lab TLS CA G2»</div><div class="s">Delegada por la raíz para emitir certificados de servidor.</div></div></div>
+          <div class="link">firma el certificado de</div>
+          <div class="node leaf"><div class="badge">🔒</div><div class="body"><div class="t">Servidor — banco-ejemplo.local</div><div class="s">El certificado que presenta el sitio al que te conectas.</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Anatomía de un certificado X.509</h3>
+        <p class="card-note">Esto es lo que muestra <code>openssl x509 -text</code>. Ejemplo didáctico y ficticio; la huella SHA-256 se calcula en vivo.</p>
+        <div class="cert" id="pki-cert"></div>
+        <div class="row" style="margin-top:14px">
+          <div class="field" style="flex:1"><label for="pki-scenario">Escenario de validación</label>
+            <select id="pki-scenario">
+              <option value="ok">Certificado legítimo</option>
+              <option value="expired">Certificado caducado</option>
+              <option value="untrusted">CA desconocida (autofirmado)</option>
+              <option value="tampered">Firma alterada (MITM)</option>
+            </select>
+          </div>
+          <div class="field" style="flex:0 0 auto;justify-content:flex-end"><label>&nbsp;</label><button class="act" id="pki-validate">Validar cadena ▸</button></div>
+        </div>
+        <div class="out" id="pki-out"><span class="d">Elige un escenario y valida la cadena…</span></div>
+      </div>
+
+      <div class="explain">
+        <h4>Piezas de una PKI</h4>
+        <p><b>CA (Autoridad de Certificación):</b> emite y firma certificados. <b>RA (Autoridad de Registro):</b> verifica la identidad antes de emitir. <b>CRL / OCSP:</b> listas y servicios para <b>revocar</b> certificados comprometidos. <b>Certificado X.509:</b> el documento que liga una identidad (un dominio) con una clave pública, firmado por la CA.</p>
+      </div>
+    </section>
+
+    <!-- ============ PROTOCOLOS ============ -->
+    <section id="protocolos">
+      <div class="eyebrow">07 · Todo junto en el mundo real</div>
+      <h2>Protocolos seguros — TLS, PGP, OpenSSL</h2>
+      <p class="lead">Ningún sistema real usa un solo algoritmo. Los protocolos combinan <b>asimétrico</b> (acordar claves y autenticar), <b>simétrico</b> (los datos, por velocidad) y <b>hash/firma</b> (integridad). A eso se le llama <b>cifrado híbrido</b>.</p>
+
+      <div class="subhead">El handshake de TLS 1.3 (HTTPS)</div>
+      <p class="lead" style="font-size:15px">Lo que ocurre en milisegundos cada vez que ves el candado 🔒. Fíjate en qué primitiva sostiene cada paso.</p>
+      <div class="card">
+        <div class="btns"><button class="act" id="tls-run">Reproducir handshake ▸</button></div>
+        <div class="flow" id="tls-flow"></div>
+      </div>
+
+      <div class="subhead">PGP · el sobre híbrido, en vivo</div>
+      <p class="lead" style="font-size:15px">PGP/GPG (correo y ficheros) hace exactamente esto: una <b>clave de sesión</b> AES aleatoria para el cuerpo, esa clave <b>cifrada con RSA</b> del destinatario, y una <b>firma</b> del remitente. Lo ejecutamos con criptografía real.</p>
+      <div class="card">
+        <h3>Alice envía un mensaje PGP a Bob</h3>
+        <p class="card-note">Se generan las claves RSA de Bob (cifrar) y de Alice (firmar), se sella el sobre y Bob lo abre.</p>
+        <div class="field"><label for="pgp-msg">Mensaje de Alice</label><textarea id="pgp-msg">Bob, las llaves están bajo la maceta. Guárdalo bien. — Alice</textarea></div>
+        <div class="btns">
+          <button class="act" id="pgp-seal">🔐 Sellar sobre (Alice)</button>
+          <button class="ghost" id="pgp-open" disabled>📬 Abrir sobre (Bob)</button>
+        </div>
+        <div class="env" id="pgp-env"></div>
+        <div class="out" id="pgp-out"><span class="d">Sella el sobre para ver sus piezas…</span></div>
+        <div id="pgp-time"></div>
+      </div>
+
+      <div class="subhead">OpenSSL · las mismas ideas en tu terminal</div>
+      <p class="lead" style="font-size:15px">OpenSSL es la navaja suiza de la criptografía. Comandos reales para reproducir este laboratorio en Linux.</p>
+      <div class="card">
+        <div class="cmd"><span class="c"># 1) Par de claves RSA y clave pública</span>
+openssl genrsa -out alice_priv.pem 2048
+openssl rsa -in alice_priv.pem -pubout -out alice_pub.pem
+
+<span class="c"># 2) Cifrar/descifrar un archivo con RSA (asimétrico)</span>
+openssl pkeyutl -encrypt -pubin -inkey bob_pub.pem -in msg.txt -out msg.enc
+openssl pkeyutl -decrypt -inkey bob_priv.pem -in msg.enc -out msg.txt
+
+<span class="c"># 3) Cifrado simétrico de un archivo (AES-256-GCM)</span>
+openssl enc -aes-256-cbc -pbkdf2 -salt -in foto.jpg -out foto.enc
+openssl enc -d -aes-256-cbc -pbkdf2 -in foto.enc -out foto.jpg
+
+<span class="c"># 4) Hash / huella de integridad</span>
+openssl dgst -sha256 documento.pdf
+
+<span class="c"># 5) Firmar y verificar (autenticidad + no repudio)</span>
+openssl dgst -sha256 -sign alice_priv.pem -out doc.sig documento.pdf
+openssl dgst -sha256 -verify alice_pub.pem -signature doc.sig documento.pdf
+
+<span class="c"># 6) PKI: CA raíz y certificado de servidor</span>
+openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 3650
+openssl x509 -in servidor.crt -text -noout        <span class="c"># ver el certificado</span>
+
+<span class="c"># 7) Diffie-Hellman e inspección de un TLS real</span>
+openssl dhparam -out dh.pem 2048
+openssl s_client -connect ejemplo.com:443 -showcerts</div>
+      </div>
+    </section>
+
+    <!-- ============ ESTEGANOGRAFÍA ============ -->
+    <section id="estego">
+      <div class="eyebrow">08 · Ocultar que existe el mensaje</div>
+      <h2>Esteganografía + RSA</h2>
+      <p class="lead">La criptografía hace un mensaje <b>ilegible</b>; la esteganografía lo hace <b>invisible</b>: lo esconde dentro de otro archivo. Combinadas dan defensa en profundidad — primero ciframos (con RSA), luego escondemos el criptograma en una imagen. Eve ni siquiera sabe que hay un secreto.</p>
+
+      <div class="card">
+        <h3>Laboratorio LSB — esconder en los bits menos significativos</h3>
+        <p class="card-note">Cada píxel tiene canales R, G, B. Cambiar el <b>último bit</b> de cada uno es imperceptible al ojo, pero suma capacidad para ocultar datos. Aquí escondemos tu mensaje (opcionalmente cifrado con RSA) dentro de la imagen.</p>
+        <label class="fdrop" id="st-drop">
+          <input type="file" id="st-input" accept="image/*" />
+          <b>Imagen portadora</b> — clic o arrastra (o usa la de ejemplo ya cargada)
+        </label>
+        <div class="field" style="margin-top:14px"><label for="st-msg">Mensaje secreto</label><textarea id="st-msg" style="min-height:52px">Coordenadas del encuentro: 40.4168 N, 3.7038 W</textarea></div>
+        <div class="row">
+          <div class="field" style="flex:0 0 240px"><label for="st-method">Cifrar antes de ocultar</label>
+            <select id="st-method">
+              <option value="none">No cifrar (solo esconder)</option>
+              <option value="rsa">Cifrar con RSA (asimétrico)</option>
+              <option value="aes">Cifrar con AES + contraseña</option>
+            </select></div>
+          <div class="field" id="st-passwrap" hidden><label for="st-pass">Contraseña AES</label><input type="password" id="st-pass" value="clave-estego" /></div>
+        </div>
+        <div class="btns">
+          <button class="act" id="st-embed">Ocultar en la imagen ▸</button>
+          <button class="ghost" id="st-extract" disabled>◂ Extraer y revelar</button>
+        </div>
+        <div class="canvases">
+          <figure><canvas id="st-orig" width="240" height="180"></canvas><figcaption><span>Portadora original</span></figcaption></figure>
+          <figure><canvas id="st-stego" width="240" height="180"></canvas><figcaption><span>Con mensaje oculto</span><span class="pill ok" id="st-badge">idéntica</span></figcaption></figure>
+        </div>
+        <div class="out" id="st-out"><span class="d">Elige una imagen y un mensaje…</span></div>
+        <div id="st-time"></div>
+      </div>
+      <div class="callout vuln"><h4>⚠ Ten en cuenta</h4><p>La esteganografía LSB es frágil: se destruye al recomprimir la imagen (p. ej. a JPEG) y existe <b>esteganálisis</b> estadístico que detecta el ruido en los LSB. <b>No sustituye al cifrado</b> — es una capa adicional.</p></div>
+      <div class="callout fix"><h4>✓ Buena práctica</h4><p>Cifra <b>siempre</b> antes de ocultar (aquí, con RSA): si detectan y extraen los bits, solo obtienen un criptograma inútil sin la clave privada.</p></div>
+    </section>
+
     <!-- ============ ARCHIVOS ============ -->
     <section id="archivos">
-      <div class="eyebrow">04 · Cifrado de ficheros</div>
+      <div class="eyebrow">09 · Cifrado de ficheros</div>
       <h2>Cifrar archivos</h2>
       <p class="lead">El mismo AES sirve para archivos completos. Aquí la clave se deriva de tu contraseña con <b>PBKDF2</b> (miles de iteraciones + sal) y se cifra con <b>AES-GCM</b>, que también verifica que nadie haya alterado el fichero.</p>
 
@@ -515,7 +805,7 @@
 
     <!-- ============ CRIPTOANÁLISIS TEÓRICO ============ -->
     <section id="criptoanalisis">
-      <div class="eyebrow">05 · Atacar el algoritmo</div>
+      <div class="eyebrow">10 · Atacar el algoritmo</div>
       <h2>Criptoanálisis clásico</h2>
       <p class="lead">Estos ataques no dependen de un fallo de programación, sino de <b>debilidades del propio esquema</b>. Se clasifican por lo que el atacante puede conseguir.</p>
 
@@ -544,7 +834,7 @@
 
     <!-- ============ IMPLEMENTACIÓN ============ -->
     <section id="implementacion">
-      <div class="eyebrow">06 · Atacar la implementación</div>
+      <div class="eyebrow">11 · Atacar la implementación</div>
       <h2>Oráculos y canales laterales</h2>
       <p class="lead">Aquí el algoritmo es sólido, pero <b>cómo se programa o se ejecuta</b> filtra información: un mensaje de error, un microsegundo de más, el consumo eléctrico de un chip.</p>
 
@@ -597,7 +887,7 @@
 
     <!-- ============ HISTORIA ============ -->
     <section id="historia">
-      <div class="eyebrow">07 · Cuando la teoría se rompió de verdad</div>
+      <div class="eyebrow">12 · Cuando la teoría se rompió de verdad</div>
       <h2>Dos fallos que hicieron historia</h2>
 
       <div class="subhead">La colisión de MD5</div>
@@ -622,7 +912,7 @@
 
     <!-- ============ MITIGACIONES ============ -->
     <section id="mitigaciones">
-      <div class="eyebrow">08 · Resumen de ingeniería</div>
+      <div class="eyebrow">13 · Resumen de ingeniería</div>
       <h2>Tabla de mitigaciones</h2>
       <p class="lead">La misma idea recorre todo el laboratorio: los algoritmos modernos son sólidos; casi todos los desastres vienen de <b>usarlos mal</b>.</p>
       <div class="wrapx" style="overflow-x:auto">
@@ -697,20 +987,28 @@ async function aesGcmDec(buf,pass){
   const iv=buf.slice(0,12),ct=buf.slice(12);
   return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct));
 }
-let symState={mode:null,payload:null};
+const BLOCK={AES:{cj:'AES',iv:16,kb:16,label:'AES-128'},TDES:{cj:'TripleDES',iv:8,kb:24,label:'3DES-168'},DES:{cj:'DES',iv:8,kb:8,label:'DES-56'}};
+function symKey(pass,bytes){return u8ToWA(waToU8(CJ.SHA512(pass)).slice(0,bytes));}
+let symState={algo:null,mode:null,payload:null};
+function syncModes(){
+  const algo=$('#s-algo').value,gcm=$('#s-mode').querySelector('[value=GCM]');
+  if(algo!=='AES'){gcm.disabled=true;if($('#s-mode').value==='GCM')$('#s-mode').value='CBC';}else gcm.disabled=false;
+}
+$('#s-algo').addEventListener('change',syncModes);syncModes();
 $('#s-enc').addEventListener('click',async()=>{
-  const msg=$('#s-msg').value,pass=$('#s-key').value,mode=$('#s-mode').value,out=$('#s-out');
+  const msg=$('#s-msg').value,pass=$('#s-key').value,algo=$('#s-algo').value,mode=$('#s-mode').value,out=$('#s-out');
   try{
-    const t0=performance.now();let hex,iv='';
-    if(mode==='GCM'){const b=await aesGcmEnc(msg,pass);hex=toB64(b);symState={mode,payload:b};}
+    const t0=performance.now();let hex,iv='',label;
+    if(algo==='AES'&&mode==='GCM'){const b=await aesGcmEnc(msg,pass);hex=toB64(b);symState={algo,mode,payload:b};label='AES-256-GCM (autenticado)';}
     else{
-      const key=keyFromPass(pass);const opt={mode:CJ.mode[mode],padding:mode==='CTR'?CJ.pad.NoPadding:CJ.pad.Pkcs7};
-      if(mode!=='ECB'){const ivwa=CJ.lib.WordArray.random(16);opt.iv=ivwa;iv=CJ.enc.Hex.stringify(ivwa);}
-      const ct=CJ.AES.encrypt(CJ.enc.Utf8.parse(msg),key,opt);
-      hex=ct.ciphertext.toString(CJ.enc.Base64);symState={mode,payload:{ct:ct.ciphertext,iv:opt.iv}};
+      const spec=BLOCK[algo];const key=symKey(pass,spec.kb);
+      const opt={mode:CJ.mode[mode],padding:mode==='CTR'?CJ.pad.NoPadding:CJ.pad.Pkcs7};
+      if(mode!=='ECB'){const ivwa=CJ.lib.WordArray.random(spec.iv);opt.iv=ivwa;iv=CJ.enc.Hex.stringify(ivwa);}
+      const ct=CJ[spec.cj].encrypt(CJ.enc.Utf8.parse(msg),key,opt);
+      hex=ct.ciphertext.toString(CJ.enc.Base64);symState={algo,mode,payload:{ct:ct.ciphertext,iv:opt.iv}};label=spec.label+'-'+mode;
     }
     const t1=performance.now();
-    out.innerHTML=`<span class="lbl">Modo</span><span class="k">${mode==='GCM'?'AES-256-GCM (autenticado)':'AES-128-'+mode}</span>`+
+    out.innerHTML=`<span class="lbl">Cifrador</span><span class="k">${label}</span>`+
       (iv?`<span class="lbl">IV (público, va con el mensaje)</span><span class="d">${iv}</span>`:'')+
       `<span class="lbl">Criptograma (base64)</span>${esc(hex)}`;
     timingChip($('#s-time'),'cifrado',t1-t0);
@@ -721,10 +1019,11 @@ $('#s-dec').addEventListener('click',async()=>{
   if(!symState.payload){out.innerHTML='<span class="r">Primero cifra un mensaje.</span>';return;}
   try{
     const t0=performance.now();let msg;
-    if(symState.mode==='GCM'){msg=await aesGcmDec(symState.payload,pass);}
-    else{const key=keyFromPass(pass);const opt={mode:CJ.mode[symState.mode],padding:symState.mode==='CTR'?CJ.pad.NoPadding:CJ.pad.Pkcs7};
+    if(symState.algo==='AES'&&symState.mode==='GCM'){msg=await aesGcmDec(symState.payload,pass);}
+    else{const spec=BLOCK[symState.algo];const key=symKey(pass,spec.kb);
+      const opt={mode:CJ.mode[symState.mode],padding:symState.mode==='CTR'?CJ.pad.NoPadding:CJ.pad.Pkcs7};
       if(symState.payload.iv)opt.iv=symState.payload.iv;
-      msg=CJ.AES.decrypt({ciphertext:symState.payload.ct},key,opt).toString(CJ.enc.Utf8);}
+      msg=CJ[spec.cj].decrypt({ciphertext:symState.payload.ct},key,opt).toString(CJ.enc.Utf8);}
     const t1=performance.now();
     out.innerHTML=`<span class="lbl">Descifrado ✓</span><span class="g">${esc(msg)||'(vacío o clave incorrecta)'}</span>`;
     timingChip($('#s-time'),'descifrado',t1-t0);
@@ -1083,4 +1382,248 @@ $('#wep-run').addEventListener('click',()=>{
     `<span class="g">P₁ = "${esc(dec.decode(xor(c1,K)))}"</span>`+
     `<span class="g">P₂ = "${esc(dec.decode(xor(c2,K)))}"</span>`;
 });
+
+/* ================= 03 · DIFFIE-HELLMAN ================= */
+$('#dh-run').addEventListener('click',()=>{
+  const out=$('#dh-out');
+  try{
+    const p=BigInt($('#dh-p').value.trim()),g=BigInt($('#dh-g').value.trim()),
+          a=BigInt($('#dh-a').value.trim()),b=BigInt($('#dh-b').value.trim());
+    if(p<2n||g<2n||g>=p)throw new Error('Usa p primo ≥ 2 y 2 ≤ g < p.');
+    const A=modpow(g,a,p),B=modpow(g,b,p),sa=modpow(B,a,p),sb=modpow(A,b,p);
+    $('#dh-ab').innerHTML=
+      `<div class="pcol alice"><h4><span class="av alice">A</span> Alice</h4>`+
+      `<div class="kv">privado <b>a = ${a}</b> · secreto</div>`+
+      `<div class="kv">publica A = gᵃ mod p = <b>${A}</b></div>`+
+      `<div class="kv">calcula Bᵃ mod p = <b>${sa}</b></div></div>`+
+      `<div class="pcol bob"><h4><span class="av bob">B</span> Bob</h4>`+
+      `<div class="kv">privado <b>b = ${b}</b> · secreto</div>`+
+      `<div class="kv">publica B = gᵇ mod p = <b>${B}</b></div>`+
+      `<div class="kv">calcula Aᵇ mod p = <b>${sb}</b></div></div>`;
+    out.innerHTML=
+      `<span class="lbl">Canal público (lo que ve Eve)</span><span class="d">p=${p}  g=${g}  A=${A}  B=${B}</span>`+
+      `<span class="lbl">Secreto compartido derivado por ambos</span>`+
+      (sa===sb?`<span class="g">🔑 ${sa} — ¡coinciden sin haberlo enviado nunca por el canal!</span>`
+              :`<span class="r">no coinciden — revisa los valores</span>`)+
+      `<span class="lbl">Para obtenerlo, Eve tendría que resolver el logaritmo discreto.</span>`;
+  }catch(e){out.innerHTML=`<span class="r">${esc(e.message)}</span>`;}
+});
+
+/* ================= 05 · FIRMA DIGITAL (RSA-PSS) ================= */
+let fdKeys=null,fdSig=null;
+$('#fd-gen').addEventListener('click',async()=>{
+  $('#fd-keys').innerHTML='<span class="d">Generando RSA-PSS 2048…</span>';
+  fdKeys=await crypto.subtle.generateKey({name:'RSA-PSS',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
+  const pub=new Uint8Array(await crypto.subtle.exportKey('spki',fdKeys.publicKey));
+  $('#fd-keys').innerHTML=`<span class="lbl">Clave pública de Alice (para verificar)</span><span class="k">${toB64(pub).slice(0,110)}…</span>`+
+    `<span class="lbl">Clave privada de Alice</span><span class="r">🔒 solo ella firma con ella</span>`;
+  $('#fd-sign').disabled=false;fdSig=null;
+});
+$('#fd-sign').addEventListener('click',async()=>{
+  fdSig=new Uint8Array(await crypto.subtle.sign({name:'RSA-PSS',saltLength:32},fdKeys.privateKey,enc.encode($('#fd-msg').value)));
+  $('#fd-out').innerHTML=`<span class="lbl">Firma de Alice (SHA-256 + RSA-PSS)</span><span class="k">${toB64(fdSig)}</span>`+
+    `<span class="lbl">Ahora Bob puede verificar. Prueba a editar el documento antes de verificar.</span>`;
+  $('#fd-verify').disabled=false;$('#fd-tamper').disabled=false;
+});
+$('#fd-verify').addEventListener('click',async()=>{
+  if(!fdSig)return;
+  const ok=await crypto.subtle.verify({name:'RSA-PSS',saltLength:32},fdKeys.publicKey,fdSig,enc.encode($('#fd-msg').value));
+  $('#fd-out').innerHTML=ok
+    ?`<span class="g">✓ FIRMA VÁLIDA — documento auténtico, íntegro y Alice no puede negarlo.</span>`
+    :`<span class="r">✗ FIRMA INVÁLIDA — el documento fue alterado o no lo firmó Alice.</span>`;
+});
+$('#fd-tamper').addEventListener('click',()=>{
+  const t=$('#fd-msg');t.value=t.value.includes('500 €')?t.value.replace('500 €','5000 €'):t.value+' [modificado por Eve]';
+  $('#fd-out').innerHTML='<span class="d">Eve alteró el documento. Pulsa «Bob verifica» y observa.</span>';
+});
+
+/* ================= 06 · PKI ================= */
+function renderCert(){
+  const fp=CJ.SHA256("banco-ejemplo.local|Cripto·Lab TLS CA G2|serial:1a4f9c2207b3e841").toString().toUpperCase().match(/../g).join(':');
+  $('#pki-cert').innerHTML=
+    `<span class="sec">Certificate:</span>`+
+    `<span class="fld">  Version: </span><span class="val">3 (0x2)</span>\n`+
+    `<span class="fld">  Serial Number: </span><span class="val">1a:4f:9c:22:07:b3:e8:41</span>\n`+
+    `<span class="fld">  Signature Algorithm: </span><span class="val">sha256WithRSAEncryption</span>\n`+
+    `<span class="fld">  Issuer: </span><span class="em">CN=Cripto·Lab TLS CA G2, O=Cripto·Lab, C=ES</span>\n`+
+    `<span class="fld">  Validity:</span>\n`+
+    `<span class="fld">    Not Before: </span><span class="val">Sep 18 00:00:00 2026 GMT</span>\n`+
+    `<span class="fld">    Not After : </span><span class="val">Dec 17 23:59:59 2026 GMT</span>\n`+
+    `<span class="fld">  Subject: </span><span class="em">CN=banco-ejemplo.local, O=Banco Ejemplo, C=ES</span>\n`+
+    `<span class="fld">  Subject Public Key: </span><span class="val">RSA 2048 bit</span>\n`+
+    `<span class="fld">  X509v3 Subject Alternative Name: </span><span class="val">DNS:banco-ejemplo.local, DNS:www.banco-ejemplo.local</span>\n`+
+    `<span class="sec">Firma de la CA intermedia:</span>\n<span class="val">   3b:8a:e2:5c:…:f0  ✍</span>\n`+
+    `<span class="sec">SHA-256 Fingerprint (calculado en vivo):</span>\n<span class="em">   ${fp}</span>`;
+}
+renderCert();
+$('#pki-validate').addEventListener('click',()=>{
+  const sc=$('#pki-scenario').value,out=$('#pki-out');
+  const steps=[
+    ['El nombre del sitio coincide con el certificado (CN/SAN)','ok'],
+    ['El certificado está dentro de su periodo de validez', sc==='expired'?'bad':'ok'],
+    ['La firma del certificado la hizo la CA intermedia', sc==='tampered'?'bad':'ok'],
+    ['La CA intermedia está firmada por una CA raíz', sc==='untrusted'?'bad':'ok'],
+    ['La CA raíz es de confianza en el navegador', sc==='untrusted'?'bad':'ok'],
+  ];
+  let html='',failed=false;
+  for(const [t,st] of steps){
+    if(failed){html+=`<div class="d">   ○ ${esc(t)}</div>`;continue;}
+    if(st==='ok')html+=`<div class="g">   ✓ ${esc(t)}</div>`;
+    else{html+=`<div class="r">   ✗ ${esc(t)}</div>`;failed=true;}
+  }
+  const msgs={expired:'Certificado CADUCADO — el navegador muestra «Tu conexión no es privada».',
+    untrusted:'CA DESCONOCIDA — certificado autofirmado o raíz no confiable; posible sitio falso.',
+    tampered:'FIRMA NO VÁLIDA — el certificado fue manipulado (posible ataque MITM).'};
+  out.innerHTML=`<span class="lbl">Validación de la cadena</span>`+html+
+    (failed?`<div class="r" style="margin-top:8px">🚫 CONEXIÓN RECHAZADA — ${esc(msgs[sc])}</div>`
+           :`<div class="g" style="margin-top:8px">🔒 CADENA VÁLIDA — candado seguro: la clave pública es realmente de banco-ejemplo.local.</div>`);
+});
+
+/* ================= 07 · TLS HANDSHAKE ================= */
+const TLS_STEPS=[
+  ['Cliente → Servidor','<b>ClientHello</b>: versiones, cifradores soportados y la clave pública efímera del cliente.','Diffie-Hellman (ECDHE)'],
+  ['Servidor → Cliente','<b>ServerHello</b> + <b>Certificado X.509</b> del servidor + su clave pública efímera.','Certificado · PKI'],
+  ['Servidor → Cliente','El servidor <b>firma</b> el intercambio con la clave privada de su certificado.','Firma digital'],
+  ['Cliente','Valida el certificado contra las CA raíz y comprueba la firma. Ambos derivan la misma clave de sesión.','Validación de cadena'],
+  ['Cliente ↔ Servidor','<b>Finished</b>: se confirma con un hash de todo el handshake.','HMAC · hash'],
+  ['Cliente ↔ Servidor','<b>Datos de aplicación</b> cifrados con la clave de sesión (rápido).','AES-GCM (simétrico)'],
+];
+function tlsMsg(dir,txt,prim,visible){
+  return `<div class="msg" style="opacity:${visible?1:0}"><span class="dir">${dir}</span>`+
+    `<div class="box">${txt}<br /><span class="prim">${prim}</span></div></div>`;
+}
+function renderTLS(visible){$('#tls-flow').innerHTML=TLS_STEPS.map(s=>tlsMsg(s[0],s[1],s[2],visible)).join('');}
+renderTLS(true);
+$('#tls-run').addEventListener('click',async e=>{
+  e.target.disabled=true;renderTLS(false);const nodes=[...$('#tls-flow').children];
+  for(const n of nodes){await new Promise(r=>setTimeout(r,60));n.style.transition='opacity .3s';n.style.opacity='1';await new Promise(r=>setTimeout(r,430));}
+  e.target.disabled=false;
+});
+
+/* ================= 07 · PGP HYBRID ENVELOPE ================= */
+let pgpBob=null,pgpAlice=null,pgpEnv=null;
+async function pgpKeys(){
+  if(pgpBob&&pgpAlice)return;
+  [pgpBob,pgpAlice]=await Promise.all([
+    crypto.subtle.generateKey({name:'RSA-OAEP',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['encrypt','decrypt']),
+    crypto.subtle.generateKey({name:'RSA-PSS',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify'])
+  ]);
+}
+function envPiece(n,hint,v){return `<div class="piece"><div><div class="n">${n}</div><div class="hint">${hint}</div></div><div class="v">${esc(v)}</div></div>`;}
+$('#pgp-seal').addEventListener('click',async e=>{
+  e.target.disabled=true;const out=$('#pgp-out');out.innerHTML='<span class="d">Generando claves y sellando el sobre…</span>';
+  try{
+    const t0=performance.now();await pgpKeys();
+    const msg=$('#pgp-msg').value;
+    const sk=crypto.getRandomValues(new Uint8Array(32));
+    const aesKey=await crypto.subtle.importKey('raw',sk,{name:'AES-GCM'},false,['encrypt']);
+    const iv=crypto.getRandomValues(new Uint8Array(12));
+    const body=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},aesKey,enc.encode(msg)));
+    const encKey=new Uint8Array(await crypto.subtle.encrypt({name:'RSA-OAEP'},pgpBob.publicKey,sk));
+    const sig=new Uint8Array(await crypto.subtle.sign({name:'RSA-PSS',saltLength:32},pgpAlice.privateKey,enc.encode(msg)));
+    pgpEnv={encKey,iv,body,sig};
+    const t1=performance.now();
+    $('#pgp-env').innerHTML=
+      envPiece('① Clave de sesión','AES-256 aleatoria (queda oculta)',toHex(sk))+
+      envPiece('② Cuerpo cifrado','AES-GCM(mensaje, clave sesión)',toB64(body))+
+      envPiece('③ Clave cifrada','RSA-OAEP(clave sesión, pública de Bob)',toB64(encKey).slice(0,60)+'…')+
+      envPiece('④ Firma','RSA-PSS(hash, privada de Alice)',toB64(sig).slice(0,60)+'…');
+    out.innerHTML='<span class="g">✉ Sobre sellado. Solo Bob (con su clave privada) puede abrir la clave de sesión.</span>';
+    timingChip($('#pgp-time'),'sellado híbrido',t1-t0);$('#pgp-open').disabled=false;
+  }catch(err){out.innerHTML=`<span class="r">${esc(err.message)}</span>`;}
+  e.target.disabled=false;
+});
+$('#pgp-open').addEventListener('click',async()=>{
+  const out=$('#pgp-out');if(!pgpEnv)return;
+  try{
+    const t0=performance.now();
+    const sk=new Uint8Array(await crypto.subtle.decrypt({name:'RSA-OAEP'},pgpBob.privateKey,pgpEnv.encKey));
+    const aesKey=await crypto.subtle.importKey('raw',sk,{name:'AES-GCM'},false,['decrypt']);
+    const msg=dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:pgpEnv.iv},aesKey,pgpEnv.body));
+    const ok=await crypto.subtle.verify({name:'RSA-PSS',saltLength:32},pgpAlice.publicKey,pgpEnv.sig,enc.encode(msg));
+    const t1=performance.now();
+    out.innerHTML=`<span class="lbl">Bob descifra la clave con su privada y luego el cuerpo</span><span class="g">"${esc(msg)}"</span>`+
+      `<span class="lbl">Firma de Alice</span>${ok?'<span class="g">✓ verificada — auténtica e íntegra</span>':'<span class="r">✗ inválida</span>'}`;
+    timingChip($('#pgp-time'),'apertura',t1-t0);
+  }catch(err){out.innerHTML=`<span class="r">${esc(err.message)}</span>`;}
+});
+
+/* ================= 08 · ESTEGANOGRAFÍA (LSB) ================= */
+let stCarrier=null,stStego=null,stRSA=null;
+function lsbEmbed(data,payload){
+  const bits=[];const total=payload.length;
+  for(let i=31;i>=0;i--)bits.push((total>>>i)&1);
+  for(const byte of payload)for(let i=7;i>=0;i--)bits.push((byte>>i)&1);
+  let bi=0;
+  for(let i=0;i<data.length&&bi<bits.length;i++){if((i&3)===3)continue;data[i]=(data[i]&0xFE)|bits[bi++];}
+  if(bi<bits.length)throw new Error('El mensaje no cabe en esta imagen. Usa una imagen más grande o un texto más corto.');
+}
+function lsbExtract(data){
+  let idx=0;const nextBit=()=>{while((idx&3)===3)idx++;const v=data[idx]&1;idx++;return v;};
+  let len=0;for(let k=0;k<32;k++)len=((len<<1)|nextBit())>>>0;
+  const cap=Math.floor(data.length*3/4/8);
+  if(len<=0||len>cap)throw new Error('sin mensaje');
+  const out=new Uint8Array(len);
+  for(let j=0;j<len;j++){let v=0;for(let k=0;k<8;k++)v=(v<<1)|nextBit();out[j]=v;}
+  return out;
+}
+function stSampleData(){
+  const c=document.createElement('canvas');c.width=240;c.height=180;const ctx=c.getContext('2d');const W=240,H=180;
+  const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#2b5b8c');sky.addColorStop(1,'#9ec4de');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#f2d06b';ctx.beginPath();ctx.arc(192,42,22,0,7);ctx.fill();
+  ctx.fillStyle='#3f7d54';ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(0,122);ctx.quadraticCurveTo(80,92,150,120);ctx.quadraticCurveTo(200,138,W,112);ctx.lineTo(W,H);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#2f5f40';ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(66,138);ctx.lineTo(140,H);ctx.closePath();ctx.fill();
+  return ctx.getImageData(0,0,W,H);
+}
+function loadCarrier(imgData){
+  stCarrier=imgData;
+  const o=$('#st-orig'),s=$('#st-stego');
+  o.width=imgData.width;o.height=imgData.height;s.width=imgData.width;s.height=imgData.height;
+  o.getContext('2d').putImageData(imgData,0,0);s.getContext('2d').putImageData(imgData,0,0);
+  stStego=null;$('#st-extract').disabled=true;$('#st-badge').textContent='idéntica';
+  const cap=Math.floor(imgData.width*imgData.height*3/8)-4;
+  $('#st-out').innerHTML=`<span class="lbl">Portadora cargada</span><span class="k">${imgData.width}×${imgData.height} px</span> · capacidad ≈ <b>${cap.toLocaleString()} bytes</b>`;
+}
+function imgFromFile(f){const img=new Image();img.onload=()=>{
+  const scale=Math.min(1,400/img.width),w=Math.round(img.width*scale),h=Math.round(img.height*scale);
+  const c=document.createElement('canvas');c.width=w;c.height=h;const cx=c.getContext('2d');cx.drawImage(img,0,0,w,h);
+  loadCarrier(cx.getImageData(0,0,w,h));};img.src=URL.createObjectURL(f);}
+$('#st-input').addEventListener('change',e=>{if(e.target.files[0])imgFromFile(e.target.files[0]);});
+['dragover','dragenter'].forEach(ev=>$('#st-drop').addEventListener(ev,e=>{e.preventDefault();$('#st-drop').classList.add('hot');}));
+['dragleave','drop'].forEach(ev=>$('#st-drop').addEventListener(ev,e=>{e.preventDefault();$('#st-drop').classList.remove('hot');}));
+$('#st-drop').addEventListener('drop',e=>{if(e.dataTransfer.files[0])imgFromFile(e.dataTransfer.files[0]);});
+$('#st-method').addEventListener('change',()=>{$('#st-passwrap').hidden=$('#st-method').value!=='aes';});
+$('#st-embed').addEventListener('click',async()=>{
+  if(!stCarrier)return;const out=$('#st-out');
+  try{
+    const t0=performance.now();const method=$('#st-method').value;let payload,info;
+    if(method==='rsa'){
+      if(!stRSA)stRSA=await crypto.subtle.generateKey({name:'RSA-OAEP',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['encrypt','decrypt']);
+      payload=new Uint8Array(await crypto.subtle.encrypt({name:'RSA-OAEP'},stRSA.publicKey,enc.encode($('#st-msg').value)));info='cifrado con RSA-OAEP y luego oculto';
+    }else if(method==='aes'){payload=await aesGcmEnc($('#st-msg').value,$('#st-pass').value);info='cifrado con AES-GCM y luego oculto';}
+    else{payload=enc.encode($('#st-msg').value);info='texto plano oculto';}
+    const data=new Uint8ClampedArray(stCarrier.data);
+    lsbEmbed(data,payload);
+    stStego=new ImageData(data,stCarrier.width,stCarrier.height);
+    $('#st-stego').getContext('2d').putImageData(stStego,0,0);
+    const t1=performance.now();
+    $('#st-badge').textContent='mensaje oculto';
+    out.innerHTML=`<span class="lbl">Ocultado ✓ (${esc(info)})</span><span class="g">${payload.length} bytes escondidos en los LSB — la imagen se ve idéntica al ojo</span>`;
+    timingChip($('#st-time'),'ocultar',t1-t0);$('#st-extract').disabled=false;
+  }catch(e){out.innerHTML=`<span class="r">${esc(e.message)}</span>`;}
+});
+$('#st-extract').addEventListener('click',async()=>{
+  if(!stStego)return;const out=$('#st-out');
+  try{
+    const t0=performance.now();const bytes=lsbExtract(stStego.data);const method=$('#st-method').value;let msg,info;
+    if(method==='rsa'){msg=dec.decode(await crypto.subtle.decrypt({name:'RSA-OAEP'},stRSA.privateKey,bytes));info='descifrado con la clave privada RSA';}
+    else if(method==='aes'){msg=await aesGcmDec(bytes,$('#st-pass').value);info='descifrado con AES';}
+    else{msg=dec.decode(bytes);info='texto plano';}
+    const t1=performance.now();
+    out.innerHTML=`<span class="lbl">Extraído de los LSB (${esc(info)})</span><span class="g">"${esc(msg)}"</span>`;
+    timingChip($('#st-time'),'extraer',t1-t0);
+  }catch(e){out.innerHTML='<span class="r">✗ No se pudo revelar: método/clave incorrectos o imagen sin datos ocultos.</span>';}
+});
+loadCarrier(stSampleData());
 </script>
