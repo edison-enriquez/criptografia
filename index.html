@@ -262,6 +262,13 @@
   .env .piece .v{font-family:var(--font-mono);font-size:11px;color:var(--muted);word-break:break-all;align-self:center}
   @media (max-width:560px){.env .piece{grid-template-columns:1fr;gap:4px}}
 
+  /* ECB block visualizer */
+  .blocks-demo{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+  .brow{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center}
+  .brow .blab{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .tiles{display:flex;gap:6px;flex-wrap:wrap}
+  .tile{font-family:var(--font-mono);font-size:11px;color:#141414;padding:6px 8px;border-radius:6px;white-space:nowrap;border:1px solid rgba(0,0,0,.18);font-variant-numeric:tabular-nums}
+
   .steps{display:flex;flex-direction:column;gap:0;margin-top:8px;counter-reset:s}
   .step{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
   .step:last-child{border-bottom:none}
@@ -376,7 +383,7 @@
 
       <div class="card">
         <h3>Banco de pruebas de cifradores de bloque</h3>
-        <p class="card-note">Elige algoritmo (DES/3DES/AES), clave y modo. Verás el criptograma y el tiempo de ejecución. GCM (solo AES) es cifrado autenticado y recomendado; ECB es deliberadamente inseguro para que veas por qué.</p>
+        <p class="card-note">Elige algoritmo (DES/3DES/AES), clave y modo. Verás el criptograma y el tiempo de ejecución. GCM (solo AES) es cifrado autenticado y recomendado; ECB es deliberadamente inseguro — mira <b>por qué</b> en la demostración de abajo.</p>
         <div class="field">
           <label for="s-msg">Mensaje de Alice</label>
           <textarea id="s-msg">Nos vemos a medianoche en el puente. — Alice</textarea>
@@ -440,6 +447,18 @@
           <figure><canvas id="cv-ecb" width="150" height="150"></canvas><figcaption><span>AES-ECB</span><span class="pill bad">patrón visible</span></figcaption></figure>
           <figure><canvas id="cv-cbc" width="150" height="150"></canvas><figcaption><span>AES-CBC</span><span class="pill ok">ruido</span></figcaption></figure>
         </div>
+        <p class="card-note" style="margin-top:2px"><b>Qué estás viendo:</b> en ECB las zonas planas de la imagen (mismos 16 bytes) se cifran <b>igual</b>, así que la silueta del candado <b>sobrevive</b>. En CBC el encadenamiento la convierte en ruido.</p>
+
+        <hr class="soft" />
+        <p class="card-note" style="margin-top:0">Lo mismo con <b>texto</b>: partimos el mensaje en bloques de 16 bytes y damos un <b>color a cada criptograma</b>. Los bloques <b>iguales del texto</b> salen del <b>mismo color en ECB</b> — la repetición se filtra sin necesidad de descifrar.</p>
+        <div class="field"><label for="ecbt-msg">Mensaje (con partes repetidas)</label><textarea id="ecbt-msg" style="min-height:46px">TRANSFERIR_1000$TRANSFERIR_1000$AL BENEFICIARIO.</textarea></div>
+        <div class="blocks-demo">
+          <div class="brow"><span class="blab">Texto</span><div class="tiles" id="ecbt-plain"></div></div>
+          <div class="brow"><span class="blab">ECB</span><div class="tiles" id="ecbt-ecb"></div></div>
+          <div class="brow"><span class="blab">CBC</span><div class="tiles" id="ecbt-cbc"></div></div>
+        </div>
+        <p class="svc-note" id="ecbt-note" style="margin-top:10px;width:auto"></p>
+
         <div class="callout vuln">
           <h4>⚠ Vulnerabilidad · CPA sobre ECB</h4>
           <p>El modo ECB es <b>determinista</b>: sin vector de inicialización, un atacante que puede pedir cifrados (ataque de texto plano elegido) aísla bloques idénticos y filtra datos secretos adyacentes. El famoso "pingüino ECB" es exactamente esto.</p>
@@ -1057,7 +1076,27 @@ function encImage(mode){
 }
 function initECB(){drawSource($('#cv-orig').getContext('2d'));['ecb','cbc'].forEach(id=>{const c=$('#cv-'+id).getContext('2d');c.fillStyle='#e9e7df';c.fillRect(0,0,150,150);c.fillStyle='#9a9a9a';c.font='12px monospace';c.textAlign='center';c.fillText('sin cifrar',75,78);});}
 $('#ecb-run').addEventListener('click',()=>{encImage('ECB');encImage('CBC');});
-initECB();
+initECB();encImage('ECB');encImage('CBC');   // mostrar el resultado ya cifrado, sin esperar clic
+
+/* ---- ECB block visualizer (texto) ---- */
+function blkColor(hex){let h=0;for(let i=0;i<hex.length;i++)h=(h*31+hex.charCodeAt(i))>>>0;return `hsl(${h%360} 60% 57%)`;}
+function renderBlocksDemo(){
+  const msg=$('#ecbt-msg').value;let bytes=enc.encode(msg);
+  const pad=(16-bytes.length%16)%16;if(pad){const b=new Uint8Array(bytes.length+pad);b.set(bytes);bytes=b;}
+  const n=bytes.length/16;if(n===0){$('#ecbt-plain').innerHTML=$('#ecbt-ecb').innerHTML=$('#ecbt-cbc').innerHTML='';return;}
+  const key=CJ.enc.Hex.parse('00112233445566778899aabbccddeeff');
+  const ecb=waToU8(CJ.AES.encrypt(u8ToWA(bytes),key,{mode:CJ.mode.ECB,padding:CJ.pad.NoPadding}).ciphertext);
+  const cbc=waToU8(CJ.AES.encrypt(u8ToWA(bytes),key,{mode:CJ.mode.CBC,padding:CJ.pad.NoPadding,iv:CJ.enc.Hex.parse('0f1e2d3c4b5a69788796a5b4c3d2e1f0')}).ciphertext);
+  const tiles=(get,label)=>{let h='';for(let i=0;i<n;i++){const blk=get(i);h+=`<span class="tile" style="background:${blkColor(toHex(blk))}">${label(blk)}</span>`;}return h;};
+  $('#ecbt-plain').innerHTML=tiles(i=>bytes.slice(i*16,i*16+16),b=>esc(dec.decode(b).split(String.fromCharCode(0)).join('·')));
+  $('#ecbt-ecb').innerHTML=tiles(i=>ecb.slice(i*16,i*16+16),b=>toHex(b).slice(0,6)+'…');
+  $('#ecbt-cbc').innerHTML=tiles(i=>cbc.slice(i*16,i*16+16),b=>toHex(b).slice(0,6)+'…');
+  const seen={};let rep=0;for(let i=0;i<n;i++){const k=toHex(bytes.slice(i*16,i*16+16));if(seen[k])rep++;seen[k]=1;}
+  $('#ecbt-note').innerHTML = rep>0
+    ? `🔎 Hay <b>${rep}</b> bloque(s) repetido(s) en el texto. En <b>ECB salen con el mismo color</b> (idéntico criptograma): Eve ve la repetición sin descifrar nada. En <b>CBC</b> cada bloque es distinto.`
+    : `Escribe al menos 16 caracteres que se repitan (o duplica una frase) y verás cómo en ECB los bloques iguales toman el mismo color, mientras que en CBC no.`;
+}
+$('#ecbt-msg').addEventListener('input',renderBlocksDemo);renderBlocksDemo();
 
 /* ================= 02 · RSA ================= */
 let rsaKeys=null,rsaCipher=null;
